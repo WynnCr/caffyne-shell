@@ -166,7 +166,7 @@ compile_snippets() {
     info "Compiling native libraries..."
 
     local blur_dir="$INSTALL_DIR/snippets/blur/lib"
-    local hacktk_dir="$INSTALL_DIR/snippets/hacktk"
+    local hacktk_dir="$INSTALL_DIR/snippets/hacktk/lib"
 
     if [[ -d "$blur_dir" ]]; then
         make -C "$blur_dir"
