@@ -64,7 +64,7 @@ class QuickSettings(Applet):
             **kwargs,
         )
         self.add_menu("wifi", WifiMenu)
-        # self.add_menu("bt", BluetoothMenu)
+        self.add_menu("bt", BluetoothMenu)
         self.add_menu("audio", AudioMenu)
         self.add_menu("kb", KeyboardMenu)
         self.add_named(LogoutMenu(self, parent),   "logout")
