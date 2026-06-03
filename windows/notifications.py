@@ -29,7 +29,6 @@ class NotificationContainer(Box):
             style_classes=["notification-container"],
         )
         notifications.connect("notification-added", lambda _, nid: self._on_notified(nid))
-        self.add(Box(style="padding: 10px;"))
     def remove_notification(self, notification_widget):
         revealer = notification_widget.get_parent()
         if revealer:
@@ -152,6 +151,8 @@ class NotificationWidget(EventBox):
         )
         self.desc_label.set_xalign(0)
         self.desc_label.set_lines(2)
+        self.desc_label.set_width_chars(1)
+        self.desc_label.set_size_request(-1, self.desc_label.get_layout().get_pixel_size()[1])
         self.content = Box(
             spacing=14,
             children=[
