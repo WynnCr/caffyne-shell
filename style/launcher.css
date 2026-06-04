@@ -68,3 +68,22 @@
 .launcher-app.focus {
     box-shadow: inset 0 0 0 2px var(--outline);
 }
+
+.launcher-grid-app {
+    min-height: 70px;
+    min-width: 104px;
+    border-radius: apply(radius-m);
+    background-color: var(--surface_container);
+    transition: 0.3s ease;
+}
+.launcher-grid-app.hover {
+    background-color: var(--surface_container_high);
+}
+
+.launcher-grid-app.active {
+    background-color: var(--surface_container_highest);
+}
+
+.launcher-grid-app.focus {
+    box-shadow: inset 0 0 0 2px var(--outline);
+}

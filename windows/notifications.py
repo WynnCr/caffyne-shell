@@ -113,13 +113,13 @@ class NotificationWidget(EventBox):
                             child=self.progress,
                             overlays=Button(
                                 style_classes=["notification-dismiss-button"],
-                                child=Box(h_align="center", children=Icon(icon_name="x-duotone")),
+                                child=Box(h_align="center", children=Icon(icon_name="x")),
                                 on_clicked=lambda *_: self._notification.close("dismissed-by-user"),
                             ),
                         ) if popup 
                             else Button(
                             style_classes=["notification-remove-button"],
-                            child=Box(h_align="center", children=Icon(icon_name="x-duotone")),
+                            child=Box(h_align="center", children=Icon(icon_name="x")),
                             on_clicked=lambda *_:self._remove_from_history(),
                         ),
                     ],

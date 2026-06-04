@@ -23,7 +23,7 @@ class DashLauncherAppItem(Button):
                 v_expand=True,
                 v_align="center",
                 children=[
-                    Image(v_expand=True, v_align="end", pixbuf=app.get_icon_pixbuf(size=52)),
+                    Image(v_expand=True, v_align="end", icon_name=app.icon_name, icon_size=52),
                     Label(
                         v_expand=True, v_align="start",
                         label=app.display_name or "",

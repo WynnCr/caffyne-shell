@@ -31,13 +31,15 @@ class TrayItem(EventBox):
             or (self._item.title.title() if self._item.title else None)
             or ""
         )
-
+    
     def _build_icon(self) -> Image:
+        if self._item.icon_name:
+            return Image(icon_name=self._item.icon_name, icon_size=16)
         pixbuf = self._item.get_preferred_icon_pixbuf(16)
         if pixbuf is not None:
-            return Image(pixbuf=pixbuf, pixel_size=16)
-        return Image(icon_name="image-missing", pixel_size=16)
-
+            return Image(pixbuf=pixbuf)
+        return Image(icon_name="image-missing", icon_size=16)
+    
     def _on_item_changed(self, *_):
         # rebuild icon and tooltip on change
         child = self._build_icon()

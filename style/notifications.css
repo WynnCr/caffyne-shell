@@ -69,3 +69,21 @@
     min-height: 276px;
     border-radius: apply(radius-m);
 }
+
+.notification-dismiss-button{
+    margin: 2px;
+    transition: background-color 0.2s ease;
+    border-radius: 20px;
+}
+.notification-dismiss-button:hover {
+    background-color: var(--surface_container);
+}
+
+.notification-remove-button{
+    padding: 6px;
+    transition: background-color 0.2s ease;
+    border-radius: 20px;
+}
+.notification-remove-button:hover {
+    background-color: var(--surface_container_high);
+}

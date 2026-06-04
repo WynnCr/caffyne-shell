@@ -779,6 +779,7 @@ class GroupWrapper(Box):
         self._outer_eb.connect("enter-notify-event", lambda w, _: w.add_style_class("hovered"))
         self._outer_eb.connect("leave-notify-event", self.on_leave)
         self._outer_eb.connect("button-press-event", lambda w, e: w.add_style_class("active") if e.button == 1 and not edit_mode.edit_mode else None)
+        self._outer_eb.connect("button-release-event", self._on_outer_click)
 
         self.drag_dest_set(
             Gtk.DestDefaults.HIGHLIGHT,
@@ -833,7 +834,23 @@ class GroupWrapper(Box):
             return False
         popup.toggle()
         return True
+    
+    def _on_outer_click(self, widget, event: Gdk.EventButton):
+        self._outer_eb.remove_style_class("active")
 
+        if edit_mode.edit_mode:
+            return False
+
+        if event.button != 1:
+            return False
+
+        popup = self._ensure_popup()
+        if popup is None:
+            return False
+
+        popup.toggle()
+        return True
+    
     def _on_edit_mode_changed(self, *_):
         self._apply_drag_state()
 
@@ -1389,6 +1406,9 @@ class Bar(Window):
                 self._blur_ctx = None
 
     def _on_button_release(self, widget, event: Gdk.EventButton):
+        if event.button == 2:
+            edit_mode.toggle()
+            return True
         if event.button == 3:
             self._show_context_menu(event)
             return True
@@ -1425,7 +1445,7 @@ class Bar(Window):
         floating_item.connect("activate", lambda _: self._toggle_floating())
         menu.append(floating_item)
     
-        min_width_label = "Full Width" if self.min_width else "Min Width (Alpha)"
+        min_width_label = "Full Width" if self.min_width else "Min Width (Beta)"
         min_width_item = Gtk.MenuItem(label=min_width_label)
         min_width_item.connect("activate", lambda _: self._toggle_min_width())
         menu.append(min_width_item)

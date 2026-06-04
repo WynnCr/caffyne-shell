@@ -113,6 +113,10 @@ class UserOptions:
             self.blur = False
             self.border_style = "medium"
 
+    class Launcher:
+        def __init__(self):
+            self.grid = False
+
     class WorldClocks:
         def __init__(self):
             self.clocks = [
@@ -130,6 +134,7 @@ class UserOptions:
         self.bars = self.Bars()
         self.timeouts = self.IdleTimeouts()
         self.theme = self.Theme()
+        self.launcher = self.Launcher()
         self.dock = self.Dock()
         self.world_clocks = self.WorldClocks()
         self.wallpaper = self.Wallpaper()
@@ -172,6 +177,7 @@ class UserOptions:
                     "bars",
                     "timeouts",
                     "theme",
+                    "launcher",
                     "dock",
                     "world_clocks",
                     "wallpaper"

@@ -5,7 +5,7 @@ from fabric.widgets.eventbox import EventBox
 from fabric.widgets.button import Button
 from icons import VolumeIcon
 from snippets import Icon, AnimatedScale, DashReveal, enable_blur, disable_blur, free_blur, trace_widget_regions
-from services.singletons import audio, brightness, wm, power_profiles, timer
+from services.singletons import audio, brightness, wm, timer
 from gi.repository import GLib, Gdk
 from user_options import user_options
 from utils.monitors import get_connector_from_monitor_id
@@ -16,17 +16,17 @@ from snippets.blur.blur import set_blur_regions
 from snippets.dashreveal import _ease_out_expo
 from utils.update_checker import check_for_updates, do_pull, restart_shell
 
-POWER_PROFILE_ICONS = {
-    "power-saver": "leaf-duotone",
-    "balanced": "scales-duotone",
-    "performance": "speedometer-duotone",
-}
+# POWER_PROFILE_ICONS = {
+#     "power-saver": "leaf-duotone",
+#     "balanced": "scales-duotone",
+#     "performance": "speedometer-duotone",
+# }
 
-POWER_PROFILE_LABELS = {
-    "power-saver": "Power Saver",
-    "balanced": "Balanced",
-    "performance": "Performance",
-}
+# POWER_PROFILE_LABELS = {
+#     "power-saver": "Power Saver",
+#     "balanced": "Balanced",
+#     "performance": "Performance",
+# }
 
 import bar
 
@@ -256,7 +256,7 @@ class OSD(WaylandWindow):
         )
 
         self.layout_icon = OSDIcon(icon_name="keyboard-duotone", label_text="")
-        self.power_icon = OSDIcon(icon_name="leaf-duotone", label_text="")
+        # self.power_icon = OSDIcon(icon_name="leaf-duotone", label_text="")
         self.alarm_icon = OSDIcon(icon_name="alarm-duotone", label_text="Alarm!")
         self.update_widget = OSDUpdate(on_dismiss=self._start_hide)
 
@@ -272,7 +272,7 @@ class OSD(WaylandWindow):
                 self.volume_bar,
                 self.brightness_bar,
                 self.layout_icon,
-                self.power_icon,
+                # self.power_icon,
                 self.alarm_icon,
                 self.update_widget,
             ]),
@@ -312,7 +312,7 @@ class OSD(WaylandWindow):
         wm.keyboard_layouts.connect("notify::current-name", self._on_layout)
         timer.connect("alarm-triggered-signal", self._on_alarm_triggered)
 
-        power_profiles.connect("changed", lambda *_: self._on_power_profile_changed())
+        # power_profiles.connect("changed", lambda *_: self._on_power_profile_changed())
         self._check_for_updates()
 
     def _on_hover_enter(self, _, event):
@@ -391,7 +391,7 @@ class OSD(WaylandWindow):
         if bar.is_applet_open("Settings"):
             return
         if self._monitor_connector == wm.active_output:
-            for child in [self.volume_bar, self.brightness_bar, self.layout_icon, self.power_icon, self.alarm_icon, self.update_widget]:
+            for child in [self.volume_bar, self.brightness_bar, self.layout_icon, self.alarm_icon, self.update_widget]:
                 child.set_visible(child is widget)
 
             if not self.is_visible():
@@ -510,8 +510,9 @@ class OSD(WaylandWindow):
         self.brightness_bar.set_value(new_val)
         brightness.screen_brightness = (new_val / 100) * brightness.max_screen
         return True
-    def _on_power_profile_changed(self):
-        profile = power_profiles.active_profile
-        self.power_icon.set_icon(POWER_PROFILE_ICONS.get(profile, "leaf-duotone"))
-        self.power_icon.set_label(POWER_PROFILE_LABELS.get(profile, profile))
-        self._show_only(self.power_icon)
+    
+    # def _on_power_profile_changed(self):
+    #     profile = power_profiles.active_profile
+    #     self.power_icon.set_icon(POWER_PROFILE_ICONS.get(profile, "leaf-duotone"))
+    #     self.power_icon.set_label(POWER_PROFILE_LABELS.get(profile, profile))
+    #     self._show_only(self.power_icon)

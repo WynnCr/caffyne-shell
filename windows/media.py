@@ -28,7 +28,7 @@ class MediaPlayer(Box):
             overlays=[Icon(icon_name="vinyl-record-duotone", pixel_size=64)],
         )
         self.cover_image = Image(
-            pixbuf=load_blurred_pixbuf(art_path, 324, 228) or None,
+            pixbuf=load_blurred_pixbuf(art_path, 324, 228, 10, 0.6) or None,
         )
         self.album_art = Image(
             pixbuf=load_cover_pixbuf(art_path, 76, 76) or None,
@@ -163,7 +163,7 @@ class MediaPlayer(Box):
         )
 
     def _on_artwork_change(self, service, art_path: str):
-        pixbuf_large = load_blurred_pixbuf(art_path, 324, 228, blur_radius=12)
+        pixbuf_large = load_blurred_pixbuf(art_path, 324, 228, blur_radius=10, darken_factor=0.6)
         pixbuf_small = load_scaled_pixbuf(art_path, 76, 76)
 
         if pixbuf_large:
@@ -214,10 +214,11 @@ class PlayerStackSwitcher(CenterBox):
     def sync(self):
         if not self._applet:
             return
+
         current = self._applet.get_current_name()
         if current:
-            self.title.set_label(current)
-        
+            self.title.set_label(current.capitalize())
+
         player_count = len(self._applet.get_player_names())
         self.end_children[0].set_visible(player_count > 1)
 

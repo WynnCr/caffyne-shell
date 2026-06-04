@@ -1,6 +1,6 @@
 import shutil
 from gi.repository import GioUnix, Gtk, GdkPixbuf, GLib
-from PIL import Image as PILImage, ImageFilter
+from PIL import Image as PILImage, ImageEnhance, ImageFilter
 import io
 from snippets import enable_blur, set_blur_regions_from_widget
 
@@ -49,11 +49,20 @@ def get_app_icon_name(app_id: str) -> str | None:
 
     return None
 
-def load_blurred_pixbuf(path: str, width: int, height: int, blur_radius=10):
+def load_blurred_pixbuf(
+    path: str,
+    width: int,
+    height: int,
+    blur_radius=10,
+    darken_factor=1.0,
+):
     try:
         img = PILImage.open(path).convert("RGBA")
         img = img.resize((width, height))
         img = img.filter(ImageFilter.GaussianBlur(blur_radius))
+
+        if darken_factor < 1.0:
+            img = ImageEnhance.Brightness(img).enhance(darken_factor)
 
         buf = io.BytesIO()
         img.save(buf, format="PNG")
