@@ -62,7 +62,7 @@ class CalendarGrid(Box):
 
         rows = []
 
-        header_row = Box(orientation="h", spacing=34, h_align="center", style="padding: 8px 0px;")
+        header_row = Box(orientation="h", spacing=16, h_align="center", style="padding: 8px 0px; margin-left: 2px;")
         for d in DAYS_OF_WEEK:
             label = Label(
                 label=d,
@@ -72,7 +72,7 @@ class CalendarGrid(Box):
             )
             label.set_xalign(0.5)
             label.set_justify(Gtk.Justification.CENTER)
-
+            label.set_size_request(32, 32)
             header_row.add(label)
         rows.append(header_row)
 

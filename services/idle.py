@@ -5,6 +5,7 @@ from fabric.core.service import Service, Property
 from gi.repository import GLib
 from loguru import logger
 from fabric.utils import get_relative_path
+from utils.session import SESSION_MANAGER
 
 
 def _get_screen_commands() -> tuple[str, str]:
@@ -33,7 +34,7 @@ def _get_screen_commands() -> tuple[str, str]:
 
 
 LOCK_CMD = f"python3 {get_relative_path('../lockscreen.py')} &"
-SUSPEND_CMD = "loginctl suspend"
+SUSPEND_CMD = f"{SESSION_MANAGER} suspend"
 
 
 def _build_rule_commands() -> dict[str, tuple[str, Optional[str]]]:
