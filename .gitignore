@@ -8,6 +8,8 @@ venv/
 style/colors.css
 style/borders.css
 
+# plugins/*
+
 # Logs / misc
 *.log
 *.so

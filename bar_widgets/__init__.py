@@ -19,6 +19,8 @@ from .keyboard import KeyboardButton
 from .apps import LauncherButton
 from .dock import Dock
 from .dash import DashButton
+from .base import BaseButton, StatButton, ProgressButton
+
 __all__ = [
     "NiriClientTitle",
     "BatteryButton",
@@ -41,4 +43,7 @@ __all__ = [
     "LauncherButton",
     "Dock",
     "DashButton",
+    "BaseButton",
+    "StatButton",
+    "ProgressButton",
 ]

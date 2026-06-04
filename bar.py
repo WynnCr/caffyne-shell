@@ -79,6 +79,10 @@ INCOMPATIBLE_GROUPS: set[frozenset] = {
     frozenset({"Settings", "Session"}),
     frozenset({"Processes", "Launcher"}),
 }
+from plugin_loader import load_plugins
+from windows.dash.applets import ALL_BEAN_DATA
+
+load_plugins(BAR_WIDGETS, APPLET_WIDGETS, INCOMPATIBLE_GROUPS, ALL_BEAN_DATA)
 
 def can_group(key_a: str, key_b: str) -> bool:
     return frozenset({key_a, key_b}) not in INCOMPATIBLE_GROUPS
