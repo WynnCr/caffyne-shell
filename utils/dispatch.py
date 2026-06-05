@@ -2,7 +2,7 @@ import os
 from fabric.utils import exec_shell_command_async, DesktopApp
 
 def dispatch_app(app: DesktopApp) -> bool:
-    cmd = app.executable
+    cmd = app.command_line
     if os.getenv("NIRI_SOCKET"):
         exec_shell_command_async(f"niri msg action spawn -- {cmd}")
     elif os.getenv("HYPRLAND_INSTANCE_SIGNATURE"):
