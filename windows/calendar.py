@@ -122,7 +122,7 @@ class CalendarWidget(Box):
         self._month = today.month
         self._selected_day = today.day
 
-        self._month_label = Label(style_classes=["calendar-month-label"])
+        self._month_label = Label(style_classes=["applet-header-label"])
 
         self._stack = HackedStack(style_classes=["applet-stack"], bezier_curve=(0.34, 1.3, 0.64, 1.0), duration=0.45)
 

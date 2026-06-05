@@ -247,7 +247,7 @@ class WeatherPopup(Box):
 
 class WeatherApplet(Applet):
     def __init__(self, parent, *kwargs):
-        self.title = Label(label=weather.location, style="padding: 9px; font-size: 14px;")
+        self.title = Label(label=weather.location, style_classes=["applet-header-label"])
         self.main_page = AppletPage(
             stack=self,
             child=WeatherPopup(),

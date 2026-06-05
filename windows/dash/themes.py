@@ -23,6 +23,12 @@ RADIUS_MAP = {
     "round":  {"radius-s": "12px", "radius-m": "18px", "radius-l": "24px", "radius-xl": "36px"},
 }
 
+FONT_MAP = {
+    "none":  {"mixed-mono": "unset",  "always-mono": "unset"},
+    "mixed": {"mixed-mono": "monospace",  "always-mono": "unset"},
+    "all":  {"mixed-mono": "monospace", "always-mono": "monospace"},
+}
+
 def _color_dot(hex_color: str, size: int = ACCENT_DOT, active: bool = False) -> Gtk.Widget:
     dot = Box(
         v_align="center",
@@ -244,6 +250,27 @@ class ThemePreview(Box):
             ],
         )
 
+        self._font_buttons: dict[str, Button] = {}
+        font_row = Box(style_classes=["option-selection-container"], orientation="h", spacing=10, h_align="center")
+        for label, key in [("None", "none"), ("Mixed", "mixed"), ("All", "all")]:
+            btn = Button(
+                label=label,
+                style_classes=["option-selection-button"],
+                on_clicked=lambda _, k=key: self._on_font_clicked(k),
+            )
+            self._font_buttons[key] = btn
+            font_row.add(btn)
+
+        font_section = Box(
+            orientation="h",
+            spacing=6,
+            h_align="fill",
+            children=[
+                Label(label="Monospace", style_classes=["dim-label"], h_expand=True, h_align="start"),
+                font_row,
+            ],
+        )
+
         self._dark_btn = Button(
             child=Box(orientation="h", spacing=6, children=[
                 Label(label="Dark")
@@ -347,11 +374,18 @@ class ThemePreview(Box):
                         blur_section,
                     ]
                 ),
+                Section(
+                    title="Fonts",
+                    children=[
+                        font_section
+                    ]
+                )
             ],
         )
 
         self._update_mode_buttons(user_options.theme.is_dark)
         self._on_radius_clicked(user_options.theme.border_style)
+        self._on_font_clicked(user_options.theme.font_monospace_style)
 
     def load_theme(self, data: dict | None) -> None:
         for child in self._accent_row.get_children():
@@ -427,6 +461,16 @@ class ThemePreview(Box):
         user_options.save()
         self._write_border_css(key)
 
+    def _on_font_clicked(self, key: str) -> None:
+        for k, btn in self._font_buttons.items():
+            if k == key:
+                btn.add_style_class("active")
+            else:
+                btn.remove_style_class("active")
+        user_options.theme.font_monospace_style = key
+        user_options.save()
+        self._write_font_css(key)
+
     def _set_dark(self, dark: bool) -> None:
         theme_service.apply_dark(dark)
         self._update_mode_buttons(dark)
@@ -449,6 +493,13 @@ class ThemePreview(Box):
         with open(path, "w") as f:
             f.write(css + "\n")
 
+    def _write_font_css(self, key: str) -> None:
+        values = FONT_MAP[key]
+        css = "\n".join(f"@define {k} {v};" for k, v in values.items())
+        path = get_relative_path("../../style/fonts.css")
+        with open(path, "w") as f:
+            f.write(css + "\n")
+
 class DashThemePage(Box):
  
     def __init__(self, bar_manager):
@@ -457,13 +508,13 @@ class DashThemePage(Box):
         self._preview = ThemePreview(bar_manager)
         self._preview_box = ClippingBox(
             style_classes=["dash-grid-selector-preview", "theme-preview-box"],
-            spacing=32,
+            spacing=16,
             orientation="v",
             h_align="center",
             v_align="start",
             h_expand=True,
             v_expand=True,
-            children=[Label(label="Theming", h_expand=True, h_align="start", style="margin-top: 64px; margin-left: 64px; font-size: 24px; font-weight: 800;"), self._preview]
+            children=[Label(label="Theming", h_expand=True, h_align="start", style="margin-top: 32px; margin-left: 64px; font-size: 24px; font-weight: 800;"), self._preview]
         ) 
         self._thumb_strip = Box(
             orientation="v",

@@ -184,7 +184,7 @@ class PlayerStackSwitcher(CenterBox):
         self._applet: "MediaApplet | None" = None
 
         self.title = Label(
-            style="padding: 8px 10px; font-size: 14px;",
+            style_classes=["applet-header-label"],
             ellipsization="end",
             max_chars_width=20,
         )

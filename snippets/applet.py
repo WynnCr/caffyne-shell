@@ -23,7 +23,7 @@ class AppletPage(Box):
         self.header_left_children = header_left_children
         self.header_label = label if label else Label(
             label=title or "",
-            style="padding: 8px 10px; font-size: 14px;",
+            style_classes=["applet-header-label"],
         )
 
         super().__init__(

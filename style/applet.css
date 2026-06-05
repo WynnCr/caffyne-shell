@@ -16,6 +16,12 @@
     transition: background-color 0.3s ease;
 }
 
+.applet-header-label {
+    font-family: apply(mixed-mono);
+    padding: 10px 8px;
+    font-size: 14px;
+}
+
 .applet-stack {
     border-radius: apply(radius-m);
 }

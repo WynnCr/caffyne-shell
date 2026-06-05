@@ -251,7 +251,7 @@ class ProcessesMenu(AppletPage):
         self.search_entry.connect("focus-out-event", lambda *_: self._entry_box.remove_style_class("focused"))
         self.title_label = Label(
             label="Processes · 0",
-            style="padding: 8px 10px; font-size: 14px;",
+            style_classes=["applet-header-label"],
         )
 
         self.process_list = Box(orientation="v", spacing=4)

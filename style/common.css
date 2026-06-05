@@ -1,9 +1,7 @@
-@import "colors.css";
-@import "borders.css";
-
 * {
     all: unset;
     color: var(--on_surface);
+    font-family: apply(always-mono);
 }
 
 .corner {

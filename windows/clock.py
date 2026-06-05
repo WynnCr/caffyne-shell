@@ -448,7 +448,7 @@ class ClockApplet(Applet):
 
         self.title_label = Label(
             label=datetime.datetime.now().strftime("%B %-d"),
-            style="padding: 8px 10px; font-size: 14px;",
+            style_classes=["applet-header-label"],
         )
 
         self._world_clocks = WorldClocksWidget()

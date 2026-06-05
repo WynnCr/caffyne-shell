@@ -44,7 +44,7 @@ class NotificationHistoryApplet(Applet):
     def __init__(self, parent, **kwargs):
         self.title = Label(
             label="Notifications · 0",
-            style="padding: 6px 10px; font-size: 14px;",
+            style_classes=["applet-header-label"]
         )
 
         self.notifications = NotificationContainer(applet=self)

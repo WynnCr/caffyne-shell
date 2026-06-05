@@ -112,6 +112,7 @@ class UserOptions:
             self.opacity = 1.0
             self.blur = False
             self.border_style = "medium"
+            self.font_monospace_style = "none"
 
     class Launcher:
         def __init__(self):

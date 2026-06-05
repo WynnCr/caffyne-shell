@@ -192,7 +192,7 @@ class LauncherApplet(Applet):
 
         self._app_count = Label(
             label=f"Apps · {len(self._all_apps)}",
-            style="padding: 8px; font-size: 14px;",
+            style_classes=["applet-header-label"],
         )
 
         self._view_toggle_icon = Icon(icon_name="list-dashes-duotone" if self._grid_mode else "squares-four-duotone", icon_size=16)
