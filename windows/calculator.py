@@ -2,6 +2,7 @@ from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.button import Button
 from snippets import Icon, Applet, AppletPage
+from gi.repository import Gdk
 import re
 
 class CalculatorApplet(Applet):
@@ -89,6 +90,7 @@ class CalculatorApplet(Applet):
             **kwargs,
         )
         self.update_display()
+        self.connect("realize", lambda _: parent.connect("key-press-event", self._on_key_press))
 
     def on_button_click(self, button: str):
         if button in "0123456789":   self.input_number(button)
@@ -99,6 +101,39 @@ class CalculatorApplet(Applet):
         elif button == "⌫":         self.backspace()
         elif button == "()":         self.input_bracket()
 
+    def _on_key_press(self, _, event):
+        key = Gdk.keyval_name(event.keyval)
+        char = chr(event.keyval) if event.keyval < 128 else None
+        if char:
+            if char in "0123456789":
+                self.on_button_click(char)
+            elif char == ".":
+                self.on_button_click(".")
+            elif char == "+":
+                self.on_button_click("+")
+            elif char == "-":
+                self.on_button_click("-")
+            elif char == "*":
+                self.on_button_click("×")
+            elif char == "/":
+                self.on_button_click("÷")
+            elif char == "%":
+                self.on_button_click("%")
+            elif char == "=":
+                self.on_button_click("=")
+            elif char == "(":
+                self.on_button_click("()")
+            elif char == ")":
+                self.on_button_click("()")
+        else:
+            if key == "BackSpace":
+                self.on_button_click("⌫")
+            elif key == "Delete":
+                self.on_button_click("C")
+            elif key == "Return":
+                self.on_button_click("=")
+                return True
+            
     def input_number(self, num: str):
         if self.showing_result:
             self.expression = num
