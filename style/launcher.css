@@ -42,6 +42,10 @@
     background-color: var(--surface_container_high);
 }
 
+.launcher-button:focus {
+    background-color: var(--surface_container_high);
+}
+
 .launcher-app-container {
     min-height: 348px;
     min-width: 324px;
@@ -75,6 +79,7 @@
     background-color: var(--surface_container);
     transition: 0.3s ease;
 }
+
 .launcher-grid-app.hover {
     background-color: var(--surface_container_high);
 }

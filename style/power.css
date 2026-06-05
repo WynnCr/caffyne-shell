@@ -32,6 +32,10 @@
     background-color: var(--surface_container_high);
 }
 
+.timeout-adjust-button:focus {
+    background-color: var(--surface_container_high);
+}
+
 .qs-power-profile-button.wide {
     padding: 4px 42px;
 }

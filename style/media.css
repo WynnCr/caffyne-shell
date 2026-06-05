@@ -28,9 +28,14 @@
     background-color: var(--primary);
     padding: 10px;
     border-radius: apply(radius-m);
+    transition: background-color 0.3s ease;
 }
 
 .player-media-icon-button:hover {
+    background-color: shade(var(--primary), 1.05);
+}
+
+.player-media-icon-button:focus {
     background-color: shade(var(--primary), 1.05);
 }
 

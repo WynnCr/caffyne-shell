@@ -24,16 +24,20 @@ class MediaPlayer(Box):
 
         self.cover_placeholder = Box(style_classes=["player-cover-placeholder"])
         self.album_placeholder = Overlay(
-            child=Box(style_classes=["player-art-placeholder"]),
-            overlays=[Icon(icon_name="vinyl-record-duotone", pixel_size=64)],
+            child=Box(style_classes=["player-art-placeholder"], style="min-width: 64px; min-height: 64px;"),
+            overlays=[Icon(icon_name="vinyl-record-duotone", icon_size=64)],
         )
+        
         self.cover_image = Image(
-            pixbuf=load_blurred_pixbuf(art_path, 324, 228, 10, 0.6) or None,
         )
         self.album_art = Image(
-            pixbuf=load_cover_pixbuf(art_path, 76, 76) or None,
             style="border-radius: 40px;",
         )
+
+        if art_path:
+            self.cover_image.set_from_pixbuf(load_blurred_pixbuf(art_path, 324, 228, 10, 0.6)) 
+            self.album_art.set_from_pixbuf(load_cover_pixbuf(art_path, 76, 76))
+
         self.cover_stack = Stack(
             children=[self.cover_placeholder, self.cover_image]
         )

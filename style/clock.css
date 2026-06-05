@@ -2,6 +2,15 @@
     background-color: var(--surface_container);
     padding: 10px;
     border-radius: apply(radius-m);
+    transition: background-color 0.3s ease;
+}
+
+.clock-timer-widget-button:hover {
+    background-color: var(--surface_container_high);
+}
+
+.clock-timer-widget-button:focus {
+    background-color: var(--surface_container_high);
 }
 
 .clock-timer-label {
@@ -20,8 +29,16 @@
     transition: background-color 0.3s ease;
 }
 
-.world-clock-button.hover {
+.world-clock-button:hover {
     background-color: var(--surface_container_high);
+}
+
+.world-clock-button:focus {
+    background-color: var(--surface_container_high);
+}
+
+.world-clock-button:active {
+    background-color: var(--surface_container);
 }
 
 .world-clock-time {

@@ -144,10 +144,6 @@ class WorldClockRow(Box):
                 on_clicked=lambda *_: on_click(),
                 style_classes=["world-clock-button"],
             )
-            btn.connect("enter-notify-event", lambda *_: btn.add_style_class("hover"))
-            btn.connect("leave-notify-event", lambda *_: btn.remove_style_class("hover"))
-            btn.connect("button-press-event", lambda *_: btn.add_style_class("active"))
-            btn.connect("button-release-event", lambda *_: btn.remove_style_class("active"))
             self.add(btn)
         else:
             self.add(inner)

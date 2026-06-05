@@ -39,7 +39,15 @@ class NightModeService(Service):
         logger.info(f"[NightModeService] Started (pid {self._process.pid})")
 
     def _kill(self):
-        if self._process:
+        if self._process is None:
+            return
+        try:
             self._process.terminate()
+            self._process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            self._process.kill()
+            self._process.wait()
+        except Exception as e:
+            logger.warning(f"[NightModeService] Error killing process: {e}")
+        finally:
             self._process = None
-            logger.info("[NightModeService] Stopped")

@@ -73,12 +73,14 @@
     color: var(--primary);
 }
 
-.menu-device-item:hover {
+.menu-device-item:hover{
     background-color: var(--surface_container_high);
 }
+
 .menu-device-item:focus {
     background-color: var(--surface_container_high);
 }
+
 .menu-list-placeholder {
     background-color: var(--surface_container);
     border-radius: apply(radius-l);
@@ -88,8 +90,3 @@
     opacity: 0.8;
     font-size: 14px;
 }
-
-/*
-.menu-device-item:focus {
-  background-color: var(--surface_container_high);
-} */

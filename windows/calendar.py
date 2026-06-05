@@ -28,7 +28,7 @@ class DayButton(Button):
         )
         self.label.set_xalign(0.5)
         self.label.set_justify(Gtk.Justification.CENTER)
-
+        self.set_can_focus(False)
 
     @property
     def day(self):

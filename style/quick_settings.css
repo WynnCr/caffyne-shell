@@ -19,6 +19,7 @@
     color: var(--background);
     transition: 0.4s ease;
 }
+
 .qs-button.active.hover {
     background-color: mix(var(--primary), var(--on_primary_container), 0.2);
 }
@@ -36,6 +37,11 @@
 .qs-button-chevron:hover {
     background-color: var(--surface_container_high);
 }
+
+.qs-button-chevron:focus {
+    background-color: var(--surface_container_high);
+}
+
 .qs-button-chevron.active {
     background-color: var(--primary);
 }
@@ -55,7 +61,12 @@
     padding: 6px 10px;
     transition: 0.4s ease;
 }
+
 .qs-button-label:hover {
+    background-color: var(--surface_container_high);
+}
+
+.qs-button-label:focus {
     background-color: var(--surface_container_high);
 }
 
@@ -64,6 +75,10 @@
 }
 
 .qs-button-label.active:hover {
+    background-color: mix(var(--primary), var(--on_primary_container), 0.2);
+}
+
+.qs-button-label.active:focus {
     background-color: mix(var(--primary), var(--on_primary_container), 0.2);
 }
 
@@ -153,8 +168,20 @@
     background-color: var(--surface_container_high);
 }
 
+.qs-device-switcher-button:focus {
+    background-color: var(--surface_container_high);
+}
+
 .qs-device-switcher-button.active {
     background-color: var(--surface_container_high);
+}
+
+.qs-device-switcher-button.active:hover {
+    background-color: var(--surface_container_highest);
+}
+
+.qs-device-switcher-button.active:focus {
+    background-color: var(--surface_container_highest);
 }
 
 .qs-menu-disconnect-button {

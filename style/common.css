@@ -49,6 +49,11 @@
     border-color: var(--surface_container_high);
 }
 
+.timeout-lock-checkbox check:focus {
+    background-color: var(--surface_container_high);
+    border-color: var(--surface_container_high);
+}
+
 .timeout-adjuster {
     min-width: 126px;
     min-height: 36px;
