@@ -235,6 +235,7 @@ class AppletWindow(PopupWindow):
             self.revealer.open()
             if user_options.theme.blur:
                 self._start_animated_blur()
+            self.set_focus(None)
     def _finish_close(self):
         GLib.timeout_add(50, self.hide)
 
