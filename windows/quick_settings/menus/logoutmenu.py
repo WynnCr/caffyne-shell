@@ -81,6 +81,7 @@ class PowerButton(Button):
             v_align="center",
             child=Box(
                 orientation="v",
+                spacing=4,
                 children=[
                     Icon(icon_name=icon_name, icon_size=24, v_expand=True, v_align="end"),
                     Label(label=label, v_expand=True, v_align="start"),
