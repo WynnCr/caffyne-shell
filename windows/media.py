@@ -27,7 +27,7 @@ class MediaPlayer(Box):
             child=Box(style_classes=["player-art-placeholder"], style="min-width: 64px; min-height: 64px;"),
             overlays=[Icon(icon_name="vinyl-record-duotone", icon_size=64)],
         )
-        
+
         self.cover_image = Image(
         )
         self.album_art = Image(
@@ -35,7 +35,7 @@ class MediaPlayer(Box):
         )
 
         if art_path:
-            self.cover_image.set_from_pixbuf(load_blurred_pixbuf(art_path, 324, 228, 10, 0.6)) 
+            self.cover_image.set_from_pixbuf(load_blurred_pixbuf(art_path, 324, 228, 10, 0.6))
             self.album_art.set_from_pixbuf(load_cover_pixbuf(art_path, 76, 76))
 
         self.cover_stack = Stack(
@@ -47,7 +47,7 @@ class MediaPlayer(Box):
         self.artist_label = Label(
             label="",
             h_align="start",
-            style="font-size: 16.5px; font-weight: bold;",
+            style="font-size: 14px; font-weight: bold;",
             ellipsization="end",
             max_chars_width=52,
         )
@@ -55,7 +55,7 @@ class MediaPlayer(Box):
         self.title_label = Label(
             label="",
             h_align="start",
-            style="font-size: 16.5px;",
+            style="font-size: 14px;",
             ellipsization="end",
             max_chars_width=52,
         )
@@ -297,7 +297,7 @@ class MediaApplet(Box):
             if media is visible:
                 return name
         return None
-    
+
     def sync(self):
         has_players = bool(self._players)
         self.set_visible(has_players)

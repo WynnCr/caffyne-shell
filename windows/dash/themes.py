@@ -119,7 +119,7 @@ class ThemeThumb(Button):
 
         self._label = Label(
             label=data.get("name", name),
-            style=f"color: {text_color}; font-size: 14px; font-weight: 600;",
+            style=f"color: {text_color}; font-size: 14px;",
         )
 
         dot_box = Box(style_classes=["theme-preview-color-container"], style=f"background-color: {surface_color}", orientation="h", spacing=4, h_align="center")
@@ -180,8 +180,8 @@ class MatugenThumb(Button):
             v_expand=True,
             style_classes=["matugen-thumb"],
             children=[
-                Label(v_expand=True, v_align="end", label="Material Colors", style="font-size: 14px; font-weight: 600;"),
-                Icon(v_expand=True, v_align="start", icon_name="android-logo-duotone"),
+                Label(v_expand=True, v_align="end", label="Material Colors", style="font-size: 14px;"),
+                Icon(v_expand=True, v_align="start", icon_name="android-logo-duotone", icon_size=36),
             ],
         )
 
@@ -501,10 +501,10 @@ class ThemePreview(Box):
             f.write(css + "\n")
 
 class DashThemePage(Box):
- 
+
     def __init__(self, bar_manager):
         self._active_thumb: ThemeThumb | MatugenThumb | None = None
- 
+
         self._preview = ThemePreview(bar_manager)
         self._preview_box = ClippingBox(
             style_classes=["dash-grid-selector-preview", "theme-preview-box"],
@@ -514,8 +514,8 @@ class DashThemePage(Box):
             v_align="start",
             h_expand=True,
             v_expand=True,
-            children=[Label(label="Theming", h_expand=True, h_align="start", style="margin-top: 32px; margin-left: 64px; font-size: 24px; font-weight: 800;"), self._preview]
-        ) 
+            children=[Label(label="Theming", h_expand=True, h_align="start", style="margin-top: 32px; margin-left: 64px; font-size: 24px; font-weight: 600;"), self._preview],
+        )
         self._thumb_strip = Box(
             orientation="v",
             spacing=12,
@@ -530,7 +530,7 @@ class DashThemePage(Box):
             overlay_scroll=True,
             kinetic_scroll=True,
         )
- 
+
         super().__init__(
             orientation="v",
             v_align="start",
@@ -547,13 +547,13 @@ class DashThemePage(Box):
                 ),
             ],
         )
- 
+
         self._load_thumbs()
         self._restore_active(theme_service.active_theme_name)
- 
+
         theme_service.connect("mode-changed", self._on_mode_changed)
         theme_service.connect("accent-changed", lambda _: self._preview.refresh_active_accent())
- 
+
         self.connect("realize", self._on_realize)
 
     def _on_realize(self, *_) -> None:
