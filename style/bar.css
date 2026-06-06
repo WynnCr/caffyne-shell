@@ -137,6 +137,10 @@
     min-width: 36px;
 }
 
+.draggable-section.center {
+    margin: 0 16px;
+}
+
 .drop-target-active {
     background-color: mix(var(--background), var(--primary), 0.2);
     min-width: 10px;

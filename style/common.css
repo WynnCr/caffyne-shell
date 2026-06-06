@@ -222,7 +222,7 @@ menuitem:focus {
 }
 
 scrollbar slider {
-    background: var(--outline);
+    background: alpha(var(--outline), 0.6);
     border-radius: apply(radius-xl);
     min-width: 6px;
     min-height: 48px;
@@ -234,7 +234,7 @@ scrollbar slider {
 }
 
 scrollbar slider:hover {
-    background: var(--on_background);
+    background: alpha(var(--outline), 1);
     min-width: 12px;
     min-height: 48px;
     /* Sofort wachsen beim Hover */
