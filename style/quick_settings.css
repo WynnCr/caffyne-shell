@@ -115,7 +115,8 @@
 }
 
 .audio-device-label-container {
-    padding: 4px;
+    min-height: 16px;
+    padding: 2px 4px;
 }
 
 .qs-button-small {

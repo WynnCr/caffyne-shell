@@ -31,7 +31,7 @@ class StreamItem(Box):
         
         super().__init__(
             orientation="v",
-            spacing=7,
+            spacing=8,
             h_expand=True, h_align="fill",
             children=[
                 Box(
