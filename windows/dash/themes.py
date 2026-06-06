@@ -514,7 +514,7 @@ class DashThemePage(Box):
             v_align="start",
             h_expand=True,
             v_expand=True,
-            children=[Label(label="Theming", h_expand=True, h_align="start", style="margin-top: 32px; margin-left: 64px; font-size: 24px; font-weight: 600;"), self._preview],
+            children=[Label(label="Theming", h_expand=True, h_align="start", style_classes=["dash-theme-preview-title"]), self._preview],
         )
         self._thumb_strip = Box(
             orientation="v",

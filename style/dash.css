@@ -198,3 +198,12 @@
 .dash-stack {
     border-radius: apply(radius-l);
 }
+
+
+.dash-theme-preview-title {
+    margin-top: 32px;
+    margin-left: 64px;
+    font-size: 24px;
+    font-weight: 600;
+    font-family: apply(mixed-mono);
+}
