@@ -90,12 +90,12 @@ class QSButton(EventBox):
     
     def _on_focus_in(self, _, event):
         if not self._menu_name:
-            self.get_child().add_style_class("hover")
+            self.get_child().add_style_class("focus")
         return False
 
     def _on_focus_out(self, _, event):
         if not self._menu_name:
-            self.get_child().remove_style_class("hover")
+            self.get_child().remove_style_class("focus")
         return False
 
     def _on_click(self, _, event):
