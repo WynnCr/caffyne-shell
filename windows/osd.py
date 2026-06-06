@@ -264,8 +264,11 @@ class OSD(WaylandWindow):
         self.alarm_icon = OSDIcon(icon_name="alarm-duotone", label_text="Alarm!")
         self.update_widget = OSDUpdate(on_dismiss=self._start_hide)
 
-        self.revealer = DashReveal(
+        self.battery_icon = OSDIcon(icon_name="battery-charging-duotone", label_text="Charging")
+        self.battery_low_icon = OSDIcon(icon_name="battery-low-duotone", label_text="Low Battery")
+        self.battery_critical_icon = OSDIcon(icon_name="battery-warning-duotone", label_text="Critical!")
 
+        self.revealer = DashReveal(
             reveal_child=False,
             style_classes=["osd-revealer"],
             child=Box(
@@ -279,6 +282,9 @@ class OSD(WaylandWindow):
                 # self.power_icon,
                 self.alarm_icon,
                 self.update_widget,
+                self.battery_icon,
+                self.battery_low_icon,
+                self.battery_critical_icon
             ]),
         )
 
@@ -308,10 +314,6 @@ class OSD(WaylandWindow):
 
         self.brightness_bar.scale.connect("value-changed", self._on_brightness_slider_changed)
         self.brightness_bar.scale.connect("scroll-event", self._on_brightness_scroll)
-
-        self.battery_icon = OSDIcon(icon_name="battery-charging-duotone", label_text="Charging")
-        self.battery_low_icon = OSDIcon(icon_name="battery-low-duotone", label_text="Low Battery")
-        self.battery_critical_icon = OSDIcon(icon_name="battery-warning-duotone", label_text="Critical!")
 
         if audio.speaker:
             self._bind_speaker(audio.speaker)
