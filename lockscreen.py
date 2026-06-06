@@ -399,6 +399,9 @@ class LockManager:
     def unlock(self):
         self._locked = False
 
+        Gdk.Display.get_default().sync()
+        self.lock.unlock_and_destroy()
+        
         for surface in list(self._surfaces.values()):
             GtkSessionLock.unmap_lock_window(surface)
 
@@ -409,8 +412,6 @@ class LockManager:
         self._covers.clear()
         self._pending.clear()
 
-        Gdk.Display.get_default().sync()
-        self.lock.unlock_and_destroy()
 
         GLib.idle_add(fabric.Application.get_default().quit)
 
