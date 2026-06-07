@@ -1736,7 +1736,6 @@ class BarManager:
         if monitor not in self._notifications:
             self._notifications[monitor] = NotificationWindow(monitor_id)
 
-        # Always create dash and OSD regardless of bar config
         if monitor not in self._dashes:
             self._dashes[monitor] = Dash(monitor_id, self)
 
@@ -1766,8 +1765,8 @@ class BarManager:
             self._bars[key] = new_bar
 
             dash = self._dashes.get(monitor)
-            if dash is not None:
-                new_bar.register_dash_callback(dash.applets.refresh_bar_state)
+            new_bar.register_dash_callback(dash.applets.refresh_bar_state)
+            dash.applets.refresh_bar_state()
 
     def _remove_bar(self, monitor: Gdk.Monitor, bar_index: int = None) -> None:
         if bar_index is not None:
