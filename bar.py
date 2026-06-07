@@ -1765,8 +1765,9 @@ class BarManager:
             self._bars[key] = new_bar
 
             dash = self._dashes.get(monitor)
-            new_bar.register_dash_callback(dash.applets.refresh_bar_state)
-            dash.applets.refresh_bar_state()
+            if dash:
+                new_bar.register_dash_callback(dash.applets.refresh_bar_state)
+                dash.applets.refresh_bar_state()
 
     def _remove_bar(self, monitor: Gdk.Monitor, bar_index: int = None) -> None:
         if bar_index is not None:
