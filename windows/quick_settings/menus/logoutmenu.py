@@ -19,20 +19,13 @@ session_id = os.environ.get("XDG_SESSION_ID", "")
 
 
 def _wm_logout():
-    # if isinstance(wm, Niri):
-    #     wm.send_command({"Action": {"Quit": {"skip_confirmation": True}}})
-    # elif isinstance(wm, Hyprland):
-    #     wm.send_command("hl.dsp.exit()")
-    # # elif isinstance(wm, Mango):
-    # #     wm.send_command("quit")
-    # else:
-        # Generic fallback
     subprocess.Popen("loginctl terminate-session $XDG_SESSION_ID", shell=True)
 
 
 class ConfirmPage(AppletPage):
-    def __init__(self, stack=None, parent=None, **kwargs):
+    def __init__(self, stack=None, parent=None, **kwargs):  # Removed play_sound from init
         self._parent = parent
+        self._play_sound = False  # Will be set dynamically in load()
         self._action_label = Label(
             label="Are you sure?",
             style="font-size: 16px;",
@@ -64,14 +57,19 @@ class ConfirmPage(AppletPage):
             **kwargs,
         )
 
-    def load(self, icon_name, label: str, callback):
+    def load(self, icon_name, label: str, callback, play_sound: bool = False):
         self._icon.icon_name = icon_name
         self._confirm_btn.set_label(label)
         self._callback = callback
+        self._play_sound = play_sound
 
     def _execute(self):
-        if self._callback:
+        if self._play_sound:
+            play_sound("session-quit")
+            GLib.timeout_add(1000, lambda: [self._callback(), False])
+        else:
             self._callback()
+            
         self._parent.toggle()
 
 
@@ -100,15 +98,15 @@ class LogoutMenu(QSAppletPage):
         self._qs = qs
         self.stack = stack
 
-        def confirm(icon, label, callback):
-            self._confirm_page.load(icon, label, callback)
+        def confirm(icon, label, callback, should_sound=False):
+            self._confirm_page.load(icon, label, callback, play_sound=should_sound)
             if stack:
                 stack.set_visible_child_name("power-confirm")
 
         self.sign_out_button = PowerButton(
             icon_name="sign-out-duotone",
             label="Logout",
-            on_clicked=lambda *_: confirm("sign-out-duotone", "Logout", _wm_logout),
+            on_clicked=lambda *_: confirm("sign-out-duotone", "Logout", _wm_logout, should_sound=True),
         )
 
         super().__init__(
@@ -139,6 +137,7 @@ class LogoutMenu(QSAppletPage):
                             on_clicked=lambda *_: confirm(
                                 "arrow-clockwise-duotone", "Reboot",
                                 lambda: subprocess.Popen(f"{SESSION_MANAGER} reboot", shell=True),
+                                should_sound=True
                             ),
                         ),
                         PowerButton(
@@ -157,6 +156,7 @@ class LogoutMenu(QSAppletPage):
                             on_clicked=lambda *_: confirm(
                                 "power-duotone", "Shutdown",
                                 lambda: subprocess.Popen(f"{SESSION_MANAGER} poweroff", shell=True),
+                                should_sound=True
                             ),
                         ),
                         PowerButton(
