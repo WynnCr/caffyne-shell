@@ -1,10 +1,9 @@
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.button import Button
-from fabric.widgets.entry import Entry
 from fabric.widgets.image import Image
 from fabric.widgets.stack import Stack
-from snippets import Applet, AppletPage, Icon, AnimatedScroll, HackedStack
+from snippets import Applet, AppletPage, Icon, AnimatedScroll, StyleAwareEntry
 from utils.dispatch import dispatch_app
 from gi.repository import Gdk, GLib
 from thefuzz import process, fuzz
@@ -202,7 +201,7 @@ class LauncherApplet(Applet):
             on_clicked=lambda *_: self._toggle_view(),
         )
 
-        self._entry = Entry(
+        self._entry = StyleAwareEntry(
             h_expand=True,
             placeholder="Type to search...",
             on_changed=lambda e, *_: self._search(e.get_text()),

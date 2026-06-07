@@ -20,6 +20,7 @@ from .scrolling_label import ScrollingLabel
 from .flat_scale import FlatScale
 from .applet_reveal import AppletReveal
 from .dashreveal import DashReveal
+from .entry import StyleAwareEntry
 __all__ = [
     "HackedRevealer",
     "HackedStack",
@@ -48,5 +49,6 @@ __all__ = [
     "ScrollingLabel",
     "FlatScale",
     "AppletReveal",
-    "DashReveal"
+    "DashReveal",
+    "StyleAwareEntry"
 ]

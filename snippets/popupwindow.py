@@ -82,9 +82,9 @@ class PopupWindow(WaylandWindow):
 
         if len(parent_anchor) == 1:
             if GtkLayerShell.Edge.TOP in parent_anchor:
-                self.anchor = "top"
+                self.anchor = "left top"
             else:
-                self.anchor = "bottom"
+                self.anchor = "left bottom"
             return move_axe
 
         if len(parent_anchor) != 3:
@@ -133,7 +133,12 @@ class PopupWindow(WaylandWindow):
             )
 
         if move_axe == "x":
-            raw_margin = round((parent_x_margin + coords_centered[0]) - (width / 2))
+            if len(self._parent.anchor) == 1:
+                bar_width = self._parent.get_allocated_width()
+                bar_left = (monitor_width - bar_width) // 2
+                raw_margin = round((bar_left + coords_centered[0]) - (width / 2))
+            else:
+                raw_margin = round((parent_x_margin + coords_centered[0]) - (width / 2))
             min_margin = EDGE_MARGIN
             max_margin = monitor_width - width - EDGE_MARGIN
             clamped = max(min_margin, min(raw_margin, max_margin))

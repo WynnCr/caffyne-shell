@@ -34,6 +34,11 @@ class Dock(EventBox):
             style_classes=["dock-pinned"],
         )
 
+        self._pinned_container = EventBox(
+            child=self._pinned_box,
+        )
+        self._setup_pinned_drop()
+
         self._workspace_box = Box(
             orientation="h",
             spacing=6,
@@ -42,9 +47,9 @@ class Dock(EventBox):
 
         self._box = Box(
             orientation="h",
-            spacing=10,
+            spacing=8,
             style_classes=["dock-inner"],
-            children=[self._pinned_box, self._workspace_box],
+            children=[self._pinned_container, self._workspace_box],
         )
 
         self._pill = WorkspacePill(offset=17, width=12)
@@ -73,7 +78,8 @@ class Dock(EventBox):
         windows = wm.windows
         workspaces = wm.workspaces
 
-        for item_data in self._state.build_pinned(windows):
+        pinned_items = self._state.build_pinned(windows)
+        for item_data in pinned_items:
             item = DockItem(
                 app_id=item_data["app_id"],
                 pinned=True,
@@ -88,10 +94,14 @@ class Dock(EventBox):
             )
             item._icon_container.add_style_class("pinned")
             self._pinned_box.add(item)
+            # item._setup_drag()
             item.show_all()
 
+        self._pinned_container.set_visible(len(pinned_items) > 0)
+
         if not workspaces or not self._monitor_output:
-            self._box.show_all()
+            # self._box.show_all()
+            self._pinned_container.set_visible(len(pinned_items) > 0)
             self._update_pill()
             return
 
@@ -123,7 +133,9 @@ class Dock(EventBox):
                 self._workspace_box.add(item)
                 item.show_all()
 
-        self._box.show_all()
+        # self._box.show_all()
+        # Re-apply pinned box visibility after show_all, which would have overridden it
+        self._pinned_container.set_visible(len(pinned_items) > 0)
         self._update_pill()
 
     def _update_pill(self, _retries: int = 0) -> None:
@@ -151,6 +163,52 @@ class Dock(EventBox):
             return False
         self._pill.move_to(x + alloc.width / 2, workspace_id=item.workspace_id)
         return False
+
+    def _setup_pinned_drop(self) -> None:
+        from .dock_item import DOCK_DRAG_TARGET, DOCK_DRAG_INFO
+        target_entry = Gtk.TargetEntry.new(DOCK_DRAG_TARGET, Gtk.TargetFlags.SAME_APP, DOCK_DRAG_INFO)
+        
+        # Attach destination directly to the box containing the children
+        self.drag_dest_set(Gtk.DestDefaults.ALL, [target_entry], Gdk.DragAction.MOVE)
+        self.connect("drag-data-received", self._on_pinned_drop)
+        self.connect("drag-motion", lambda w, ctx, x, y, t: self._on_drag_motion)
+
+    def _on_drag_motion(self, widget, ctx, x, y, time):
+        Gdk.drag_status(ctx, Gdk.DragAction.MOVE, time)
+        return True
+    
+    def _on_pinned_drop(self, widget, context, x, y, data, info, time) -> None:
+        print("dropa")
+        src_app_id = data.get_text()
+        Gtk.drag_finish(context, True, False, time)
+        if not src_app_id:
+            return
+
+        # Hit-test children to find which item we dropped onto and which side
+        items = [c for c in self._pinned_box.get_children() if isinstance(c, DockItem)]
+        target_item = None
+        before = True
+        for item in items:
+            try:
+                item_x, _ = item.translate_coordinates(self, 0, 0)
+            except Exception:
+                continue
+            alloc = item.get_allocation()
+            if item_x <= x < item_x + alloc.width:
+                target_item = item
+                before = x < item_x + alloc.width / 2
+                break
+
+        if target_item is None:
+            # Dropped past the last item — move to end
+            if items:
+                target_item = items[-1]
+                before = False
+
+        if target_item is None or target_item.app_id == src_app_id:
+            return
+
+        self._on_reorder(src_app_id, target_item.app_id, before)
 
     def _on_reorder(self, src_app_id: str, target_app_id: str, before: bool) -> None:
         src_entry = self._state.get_entry(src_app_id)

@@ -4,6 +4,8 @@
     font-family: apply(always-mono);
 }
 
+@define-color placeholder_text_color var(--on_surface_variant);
+
 .corner {
     color: var(--background);
 }
@@ -190,6 +192,7 @@ menuitem:focus {
 
 .scale slider {
     background-color: var(--primary);
+    color: var(--on_primary);
     min-height: 16px;
     min-width: 16px;
     border-radius: apply(radius-xl);
@@ -203,8 +206,10 @@ menuitem:focus {
 }
 
 .scale.active slider {
-    min-height: 12px;
-    min-width: 12px;
+    min-height: 4px;
+    min-width: 4px;
+    /* margin-left: 10px;
+    margin-right: 10px; */
 }
 
 .scale trough {

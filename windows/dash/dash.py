@@ -188,12 +188,23 @@ class Dash(Window):
         return False
 
     def toggle_applets(self):
-        """Open dash straight to the applets page and enable edit mode."""
         self.h_group_1.set_visible_child(self.applets)
         self.v_stack.set_visible_child(self.h_group_1)
         if not self.is_visible():
             self.toggle()
         edit_mode.enable()
+
+    def toggle_wallpapers(self):
+        self.h_group_2.set_visible_child(self.wallpapers)
+        self.v_stack.set_visible_child(self.h_group_2)
+        if not self.is_visible():
+            self.toggle()
+
+    def toggle_themes(self):
+        self.v_stack.set_visible_child(self.h_group_2)
+        self.h_group_2.set_visible_child(self.themes)
+        if not self.is_visible():
+            self.toggle()
 
     def _hide(self):
         self.hide()

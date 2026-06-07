@@ -5,6 +5,7 @@
 .dock-pinned {
     /* background-color: var(--surface_container); */
     padding: 0px 0px;
+    /* margin-right: -2px; */
     border-radius: apply(radius-m);
 }
 

@@ -2,9 +2,8 @@ import psutil
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.button import Button
-from fabric.widgets.entry import Entry
 from fabric.widgets.overlay import Overlay
-from snippets import Applet, AppletPage, Icon, ClippingBox, ClippingScrolledWindow
+from snippets import Applet, AppletPage, Icon, ClippingBox, ClippingScrolledWindow, StyleAwareEntry
 from gi.repository import GLib, Gdk
 from services.singletons import process_monitor
 from snippets import Graph
@@ -234,7 +233,7 @@ class ProcessesMenu(AppletPage):
         self._process_widgets = {}
         self._search_text = ""
         self.parent = parent
-        self.search_entry = Entry(
+        self.search_entry = StyleAwareEntry(
             h_expand=True, h_align="fill",
             placeholder="Type to search...",
             style_classes=["process-search"],

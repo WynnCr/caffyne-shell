@@ -18,4 +18,5 @@ class DashButton(BaseButton):
             import services.singletons as singletons
             if singletons.bar_manager:
                 singletons.bar_manager.toggle("Dash")
+                self.get_parent().remove_style_class("active")
             return True

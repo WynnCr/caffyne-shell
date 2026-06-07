@@ -6,7 +6,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.overlay import Overlay
 from fabric.widgets.circularprogressbar import CircularProgressBar
 from fabric.widgets.stack import Stack
-from snippets import Icon, Applet, AppletPage, TimeoutAdjuster, AnimatedScroll, ClippingScrolledWindow
+from snippets import Icon, Applet, AppletPage, TimeoutAdjuster, AnimatedScroll, ClippingScrolledWindow, StyleAwareEntry
 from services.singletons import timer
 from gi.repository import GLib, Gdk, Gtk
 
@@ -14,14 +14,12 @@ from user_options import user_options
 
 AVAILABLE_TIMEZONES = sorted(zoneinfo.available_timezones())
 
-from fabric.widgets.entry import Entry
-
 class TimezoneSearchPage(AppletPage):
     def __init__(self, parent, stack, on_select: callable, slot_index: int):
         self._on_select = on_select
         self._all_zones = AVAILABLE_TIMEZONES
         
-        self._entry = Entry(
+        self._entry = StyleAwareEntry(
             h_expand=True,
             placeholder="Type to search...",
         )

@@ -21,6 +21,7 @@ from .system_tray import SystemTray
 from user_options import user_options
 
 bar_manager = None
+style_service = None
 audio = Audio()
 notifications = Notifications()
 bluetooth = BluetoothClient()

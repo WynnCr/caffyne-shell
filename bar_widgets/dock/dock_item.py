@@ -196,10 +196,6 @@ class DockItem(EventBox):
         self.connect("drag-begin", self._on_drag_begin)
         self.connect("drag-data-get", self._on_drag_data_get)
         self.connect("drag-end", self._on_drag_end)
-        self.drag_dest_set(Gtk.DestDefaults.ALL, [target_entry], Gdk.DragAction.MOVE)
-        self.connect("drag-data-received", self._on_drag_data_received)
-        self.connect("drag-motion", self._on_drag_motion)
-        self.connect("drag-leave", self._on_drag_leave)
 
     def _on_drag_begin(self, widget: Gtk.Widget, context: Gdk.DragContext) -> None:
         self._drag_started = True
@@ -211,21 +207,3 @@ class DockItem(EventBox):
 
     def _on_drag_data_get(self, _, __, data: Gtk.SelectionData, *___) -> None:
         data.set_text(self.app_id, -1)
-
-    def _on_drag_motion(self, widget, context, x, y, time) -> bool:
-        Gdk.drag_status(context, Gdk.DragAction.MOVE, time)
-        self.get_style_context().add_class("drag-over")
-        return True
-
-    def _on_drag_leave(self, widget, *_) -> None:
-        self.get_style_context().remove_class("drag-over")
-
-    def _on_drag_data_received(self, widget, context, x, y, data, info, time) -> None:
-        src_app_id = data.get_text()
-        Gtk.drag_finish(context, True, False, time)
-        self.get_style_context().remove_class("drag-over")
-        if not src_app_id or src_app_id == self.app_id:
-            return
-        alloc = self.get_allocation()
-        before = x < alloc.width / 2
-        self._on_reorder(src_app_id, self.app_id, before)

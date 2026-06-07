@@ -90,13 +90,17 @@ class DockState:
         result = []
         for entry in self.get_pinned():
             wins = running_by_app.get(entry.app_id, [])
+            is_running = len(wins) > 0
 
-            window = next((w for w in wins if w.is_focused), wins[0] if wins else None)
+            # Don't show pinned items that are currently open
+            if is_running:
+                continue
+
             result.append({
                 "app_id": entry.app_id,
                 "pinned": True,
-                "running": len(wins) > 0,
-                "window": window,
+                "running": False,
+                "window": None,
                 "workspace_id": -1,
                 "order": entry.order,
             })

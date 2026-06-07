@@ -1,10 +1,9 @@
 from fabric.widgets.box import Box
 from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.button import Button
-from fabric.widgets.entry import Entry
 from fabric.widgets.label import Label
 from fabric.widgets.grid import Grid
-from snippets import Icon, HackedStack, AnimatedScroll
+from snippets import Icon, HackedStack, AnimatedScroll, StyleAwareEntry
 
 class DashHeader(CenterBox):
     """
@@ -16,7 +15,7 @@ class DashHeader(CenterBox):
     """
 
     def __init__(self):
-        self._entry = Entry(h_expand=True, h_align="fill", placeholder="Type to search...")
+        self._entry = StyleAwareEntry(h_expand=True, h_align="fill", placeholder="Type to search...")
         self._entry_box = Box(
             style_classes=["launcher-search"],
             spacing=8,

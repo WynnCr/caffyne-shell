@@ -416,7 +416,8 @@ class WidgetWrapper(Box):
         self.event_box.add(child)
         self.add(self.event_box)
 
-        self.event_box.connect("button-release-event", self._on_click)
+        if self.widget_key in APPLET_WIDGETS:
+            self.event_box.connect("button-release-event", self._on_click)
         if key not in ["Workspaces", "Dock"]:
             self.event_box.add_style_class("bar-widget")
             
@@ -436,7 +437,10 @@ class WidgetWrapper(Box):
         _dragging_key = None
         _dragging_widget = None
         GLib.idle_add(lambda: self.set_visible(True))
-                
+    def on_button_release(self, widget, event):
+        if event.button == 1:
+            widget.remove_style_class("active")
+        return False
     def on_leave(self, w, event):
         if event.detail != Gdk.NotifyType.INFERIOR:
             w.remove_style_class("hovered")
@@ -1145,7 +1149,6 @@ class DraggableSection(Box):
                 child.event_box.remove_style_class("group-drop-invalid")
 
     def _handle_reorder_drop(self, parts, x, y, ctx, time):
-        print("reorder")
         src_monitor_id, src_bar_index_str, src_section_name, src_index_str = parts
         try:
             src_index = int(src_index_str)
@@ -1462,7 +1465,7 @@ class Bar(Window):
         floating_item.connect("activate", lambda _: self._toggle_floating())
         menu.append(floating_item)
     
-        min_width_label = "Full Width" if self.min_width else "Min Width (Beta)"
+        min_width_label = "Full Width" if self.min_width else "Min Width"
         min_width_item = Gtk.MenuItem(label=min_width_label)
         min_width_item.connect("activate", lambda _: self._toggle_min_width())
         menu.append(min_width_item)
@@ -1830,6 +1833,20 @@ class BarManager:
                 dash = self._dashes.get(active_monitor)
                 if dash:
                     dash.toggle()
+            return
+
+        if key == "Wallpapers":
+            if active_monitor is not None:
+                dash = self._dashes.get(active_monitor)
+                if dash:
+                    dash.toggle_wallpapers()
+            return
+        
+        if key == "Themes":
+            if active_monitor is not None:
+                dash = self._dashes.get(active_monitor)
+                if dash:
+                    dash.toggle_themes()
             return
 
         if key == "EditApplets":
