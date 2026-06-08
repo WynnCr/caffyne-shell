@@ -612,6 +612,7 @@ class WidgetWrapper(Box):
             )
             section.add(group)
             section.reorder_child(group, self_index)
+            play_sound("widget-placed")
             Gtk.drag_finish(ctx, True, False, time)
             bar.sync_config()
             return
@@ -694,7 +695,7 @@ class WidgetWrapper(Box):
         )
         dst_section.add(group)
         dst_section.reorder_child(group, self_index)
-
+        play_sound("widget-placed")
         Gtk.drag_finish(ctx, True, False, time)
         bar.sync_config()
     
