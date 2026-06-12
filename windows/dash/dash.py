@@ -45,8 +45,8 @@ class DashDismissLayer(Window):
             visible=False,
             child=self.event_box,
         )
-
         self.event_box.connect("button-release-event", self._on_button_press)
+        GtkLayerShell.set_exclusive_zone(self, -1)
 
     def _on_button_press(self, widget, event: Gdk.EventButton):
         if event.button == 1:
@@ -155,7 +155,6 @@ class Dash(Window):
         # niri.connect("notify::active-window", self._on_window_changed)
         # niri.connect("notify::workspaces", self._on_workspace_changed)
         self._sync_header()
-        GtkLayerShell.set_exclusive_zone(self, -1)
 
     def _on_key_press(self, _, event):
         if self._current_page_name() not in _PAGES_WITH_SEARCH:
