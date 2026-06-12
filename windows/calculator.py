@@ -33,7 +33,7 @@ class CalculatorApplet(Applet):
 
         buttons = [
             [
-                ("C",  "C",  "arrows-counter-clockwise-duotone", "operator"),
+                ("C",  "C",  "arrow-counter-clockwise-duotone", "operator"),
                 ("()", "()", "brackets-round",           "operator"),
                 ("%",  "%",  "percent-duotone",          "operator"),
                 ("÷",  "÷",  "divide",                   "operator"),
@@ -133,7 +133,7 @@ class CalculatorApplet(Applet):
             elif key == "Return":
                 self.on_button_click("=")
                 return True
-            
+
     def input_number(self, num: str):
         if self.showing_result:
             self.expression = num
@@ -187,13 +187,13 @@ class CalculatorApplet(Applet):
         try:
             if not expr or expr == "0":
                 return None
-            
+
             open_count = expr.count("(")
             close_count = expr.count(")")
             expr_eval = expr + ")" * (open_count - close_count)
-            
+
             expr_eval = expr_eval.replace("×", "*").replace("÷", "/")
-            
+
             expr_eval = re.sub(r'(\d)(\()', r'\1*\2', expr_eval)
             expr_eval = re.sub(r'(\))(\()', r'\1*\2', expr_eval)
             expr_eval = re.sub(r'(\))(\d)', r'\1*\2', expr_eval)

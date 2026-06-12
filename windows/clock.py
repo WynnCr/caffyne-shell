@@ -18,7 +18,7 @@ class TimezoneSearchPage(AppletPage):
     def __init__(self, parent, stack, on_select: callable, slot_index: int):
         self._on_select = on_select
         self._all_zones = AVAILABLE_TIMEZONES
-        
+
         self._entry = StyleAwareEntry(
             h_expand=True,
             placeholder="Type to search...",
@@ -38,7 +38,7 @@ class TimezoneSearchPage(AppletPage):
             orientation="v",
             spacing=6,
         )
-        
+
         self._scroll = ClippingScrolledWindow(
             child=self._list_box,
             style_classes=["scrollable"],
@@ -47,7 +47,7 @@ class TimezoneSearchPage(AppletPage):
             kinetic_scroll=True,
             overlay_scroll=True
         )
-        
+
         super().__init__(
             stack=stack,
             title=f"Select Timezone",
@@ -57,7 +57,7 @@ class TimezoneSearchPage(AppletPage):
                 children=[self._entry_box, self._scroll],
             ),
         )
-        
+
         self._entry.connect("changed", lambda e: self._filter(e.get_text()))
         self._populate(self._all_zones)
         self.connect("realize", lambda *_: parent.connect("key-press-event", self._on_key_press))
@@ -80,7 +80,7 @@ class TimezoneSearchPage(AppletPage):
             self._entry.grab_focus()
             self._entry.set_position(-1)
         return False
-    
+
     def _populate(self, zones):
         for child in self._list_box.get_children():
             child.destroy()
@@ -358,7 +358,7 @@ class StopwatchWidget(Box):
             self.lap_reset_icon.icon_name = "timer-duotone"
         elif timer.stopwatch_time > 0:
             self.play_icon.icon_name = "play-duotone"
-            self.lap_reset_icon.icon_name = "arrows-clockwise-duotone"
+            self.lap_reset_icon.icon_name = "arrow-counter-clockwise-duotone"
         else:
             self.lap_reset_icon.icon_name = "clock-clockwise-duotone"
 
