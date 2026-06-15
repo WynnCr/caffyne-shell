@@ -453,7 +453,7 @@ class ClockApplet(Applet):
         )
 
         self.clock_label = Label(
-            style="font-size: 20px;",
+            style_classes=["clock-label"],
         )
         self.clock_label.set_xalign(0.5)
         self.clock_label.set_justify(Gtk.Justification.CENTER)

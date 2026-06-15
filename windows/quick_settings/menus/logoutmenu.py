@@ -69,7 +69,7 @@ class ConfirmPage(AppletPage):
             GLib.timeout_add(500, lambda: [self._callback(), False])
         else:
             self._callback()
-            
+
         self._parent.toggle()
 
 
@@ -132,7 +132,7 @@ class LogoutMenu(QSAppletPage):
                     ]),
                     Box(spacing=6, h_expand=True, children=[
                         PowerButton(
-                            icon_name="arrow-counter-clockwise-duotone",
+                            icon_name="arrow-clockwise-duotone",
                             label="Reboot",
                             on_clicked=lambda *_: confirm(
                                 "arrow-clockwise-duotone", "Reboot",

@@ -138,7 +138,7 @@
 /* ── Context Menu Container ── */
 menu,
 .context-menu {
-    background-color: var(--background);
+    background-color: var(--surface_container_lowest);
     box-shadow: inset 0 0 0 1px var(--outline_variant);
     border-radius: apply(radius-l);
     padding: 6px;
@@ -196,8 +196,8 @@ menuitem:focus {
     min-height: 16px;
     min-width: 16px;
     border-radius: apply(radius-xl);
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
 .scale.hover slider {
@@ -206,8 +206,8 @@ menuitem:focus {
 }
 
 .scale.active slider {
-    min-height: 4px;
-    min-width: 4px;
+    min-height: 6px;
+    min-width: 6px;
     /* margin-left: 10px;
     margin-right: 10px; */
 }

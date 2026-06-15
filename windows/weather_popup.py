@@ -155,7 +155,6 @@ class WeatherPopup(Box):
         self._daily_box = Box(orientation="v", spacing=12, style_classes=["daily-forecast"])
         self._temp_label = Label(
             label=f"{weather.temperature:.0f}°C" if weather.temperature else "---",
-            style="font-size: 24px; font-weight: 600;",
             style_classes=["current-temp"]
         )
         self._icon = Icon(icon_name="cloud-duotone", icon_size=36, style_classes=["current-icon"])

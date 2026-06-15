@@ -4,6 +4,12 @@
     border-radius: apply(radius-m);
 }
 
+.current-temp {
+    font-family: apply(mixed-mono);
+    font-size: 24px;
+    font-weight: 600;
+}
+
 .hourly-item {
     padding: 0px 8px;
 }

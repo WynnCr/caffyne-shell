@@ -13,6 +13,12 @@
     padding: 18px;
 }
 
+.lockscreen-clock-label {
+    font-family: apply(mixed-mono);
+    font-size: 32px;
+    font-weight: 600;
+}
+
 .lockscreen-submit-button {
     background-color: var(--primary);
     padding: 10px 12px;

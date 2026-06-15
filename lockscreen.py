@@ -134,7 +134,7 @@ class LockScreen(Window):
             max_value=60,
             value=0,
         )
-        self.clock_label = Label(style="font-size: 32px;")
+        self.clock_label = Label(style_classes="lockscreen-clock-label")
         self.clock_label.set_xalign(0.5)
         self.clock_label.set_justify(Gtk.Justification.CENTER)
         self.clock_circle = Overlay(
@@ -408,7 +408,7 @@ class LockManager:
 
         Gdk.Display.get_default().sync()
         self.lock.unlock_and_destroy()
-        
+
         for surface in list(self._surfaces.values()):
             GtkSessionLock.unmap_lock_window(surface)
 

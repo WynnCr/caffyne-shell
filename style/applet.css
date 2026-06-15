@@ -22,8 +22,7 @@
 
 .applet-header-label {
     font-family: apply(mixed-mono);
-    padding: 1px 10px 0px 10px;
-    font-size: 14px;
+    padding: 0px 10px 0px 10px;
 }
 
 .applet-stack {
