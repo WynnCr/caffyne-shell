@@ -11,12 +11,17 @@
 }
 
 .hourly-item {
-    padding: 0px 8px;
+    margin-right: 18px;
+}
+
+.hourly-item:last-child {
+    margin-right: 0px;
 }
 
 .hourly-time {
     font-size: 11px;
-    opacity: 0.6;
+    color: var(--on_surface_variant);
+    min-width: 24px;
 }
 
 .hourly-temp {
@@ -33,6 +38,10 @@
     min-height: 6px;
     border-radius: 8px;
     background-color: alpha(var(--primary), 0.2);
+}
+
+.daily-forecast {
+    padding-bottom: 4px;
 }
 
 .daily-day {
