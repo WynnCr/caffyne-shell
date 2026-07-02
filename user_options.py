@@ -85,11 +85,7 @@ class UserOptions:
                 "Europe/London",
                 "Africa/Addis_Ababa"
             ]
-
-    class Wallpaper:
-        def __init__(self):
-            self.path = f"{get_relative_path('wallpapers/Ventura-dark.jpg')}"
-
+            
     class Dock:
         def __init__(self):
             self.entries = []
