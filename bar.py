@@ -1,3 +1,4 @@
+from __future__ import annotations
 import cairo
 import math
 from fabric.widgets.wayland import WaylandWindow as Window

@@ -5,6 +5,7 @@ venv/
 .env/
 .venv/
 
+result/
 plugins/*
 
 styles/colors.css
