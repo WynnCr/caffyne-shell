@@ -4,6 +4,7 @@
 , pythonEnv
 , gtk3
 , gtk-layer-shell
+, gtk-session-lock
 , gobject-introspection
 , libdbusmenu-gtk3
 , gdk-pixbuf
@@ -82,6 +83,7 @@ let
     gtk3
     gtk-layer-shell
     gobject-introspection
+    gtk-session-lock
     libdbusmenu-gtk3
     gdk-pixbuf
     librsvg

@@ -34,6 +34,7 @@
           libdbusmenu-gtk3
           gdk-pixbuf
           gnome-bluetooth
+          gtk-session-lock
           cinnamon-desktop
           librsvg
           linux-pam
