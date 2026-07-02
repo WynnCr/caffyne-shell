@@ -5,8 +5,9 @@ venv/
 .env/
 .venv/
 
-result/
+result
 plugins/*
+wallpapers/*
 
 styles/colors.css
 styles/borders.css
