@@ -251,6 +251,10 @@ class LauncherApplet(Applet):
         self._grid_mode = not self._grid_mode
         user_options.launcher.grid = self._grid_mode
         user_options.save()
+        for child in self._list_box.get_children():
+            child.destroy()
+        for child in self._grid_box.get_children():
+            child.destroy()
         icon = "list-dashes-duotone" if self._grid_mode else "squares-four-duotone"
         self._view_toggle_icon.set_icon_name(icon)
         self._view_stack.set_visible_child_name("grid" if self._grid_mode else "list")
