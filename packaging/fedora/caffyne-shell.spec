@@ -5,7 +5,7 @@ Summary:        A modern, GTK-based desktop shell built on top of Fabric
 
 License:        GPL-3.0-only
 URL:            https://github.com/caffyne-org/caffyne-shell
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/WynnCr/caffyne-shell/archive/refs/heads/main.tar.gz#/caffyne-shell-1.0.0.tar.gz
 Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/master.tar.gz#/fabric-master.tar.gz
 Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
 
@@ -61,7 +61,7 @@ caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Pytho
 It features a highly customizable drag-and-drop panel, fluid animations, and deeply integrated system applets designed specifically for modern Wayland compositors.
 
 %prep
-%autosetup -n %{name}-%{version} -a 1 -a 2
+%autosetup -n caffyne-shell-main -a 1 -a 2
 
 %build
 # Compile native snippets
