@@ -114,6 +114,9 @@ popd
 /usr/share/caffyne-shell/
 %{_bindir}/startcaffyneshell
 %{_bindir}/fabric-cli
+/usr/share/bash-completion/completions/fabric-cli
+/usr/share/fish/completions/fabric-cli.fish
+/usr/share/zsh/site-functions/_fabric-cli
 /usr/lib*/python3.*/site-packages/fabric/
 /usr/lib*/python3.*/site-packages/fabric-*.dist-info/
 
