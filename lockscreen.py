@@ -1,4 +1,6 @@
 import os
+import sys
+import subprocess
 import gi
 import pam
 import fabric
@@ -64,6 +66,7 @@ class CoverWindow(WaylandWindow):
             child=self._reveal,
         )
         GtkLayerShell.set_exclusive_zone(self, -1)
+
     def _load_wallpaper(self):
         try:
             if os.path.exists(WALLPAPER_PATH):
@@ -75,13 +78,13 @@ class CoverWindow(WaylandWindow):
         return None
 
     def play_unlock(self, on_done=None):
-        # self.show_all()
         self._reveal.close(on_done=lambda: self._finish(on_done))
 
     def _finish(self, on_done):
         self.hide()
         if on_done:
             on_done()
+
 
 class LockScreen(Window):
     def __init__(self, lock: GtkSessionLock.Lock, monitor: Gdk.Monitor, cover: CoverWindow, manager: "LockManager"):
@@ -173,7 +176,6 @@ class LockScreen(Window):
                 overlays=self._layout,
             ),
         )
-        # self._bg_box.set_style(f"background-image: url('{WALLPAPER_PATH}');")
         self.set_decorated(False)
 
         self._wake_anim = (
@@ -313,8 +315,8 @@ class LockManager:
         self.lock = GtkSessionLock.prepare_lock()
         self._surfaces: dict[Gdk.Monitor, LockScreen] = {}
         self._covers:   dict[Gdk.Monitor, CoverWindow] = {}
-        self._pending:  set[Gdk.Monitor] = set()   # monitors mid-animation
-        self._locked = False                         # true once lock_lock() called
+        self._pending:  set[Gdk.Monitor] = set()
+        self._locked = False
 
         display = Gdk.Display.get_default()
         for i in range(display.get_n_monitors()):
@@ -329,21 +331,14 @@ class LockManager:
         )
         display.connect("monitor-removed", lambda _, mon: self._remove_monitor(mon))
 
-    # ------------------------------------------------------------------ #
-    #  Monitor lifecycle                                                   #
-    # ------------------------------------------------------------------ #
-
     def _add_monitor(self, monitor: Gdk.Monitor, monitor_id=None):
-        # Deduplicate: ignore if already tracked or mid-animation
         if monitor in self._surfaces or monitor in self._pending:
             return
 
         if self._locked:
-            # Screen already locked — skip cover animation, go straight to lock surface
             self._engage_lock(monitor, cover=None)
             return
 
-        # Screen not yet locked — show cover window first
         if monitor_id is None:
             monitor_id = list(self._covers).index(monitor) if monitor in self._covers else 0
 
@@ -358,16 +353,14 @@ class LockManager:
         )
 
     def _on_cover_ready(self, monitor: Gdk.Monitor, cover: CoverWindow) -> bool:
-        # Guard: monitor may have been removed while we were waiting
         if monitor not in self._covers:
             self._pending.discard(monitor)
             return False
 
         self._engage_lock(monitor, cover)
-        return False  # remove GLib timeout
+        return False
 
     def _engage_lock(self, monitor: Gdk.Monitor, cover: CoverWindow | None):
-        # Deduplicate: surface may have been created by a concurrent call
         if monitor in self._surfaces:
             self._pending.discard(monitor)
             return
@@ -385,12 +378,7 @@ class LockManager:
         if cover is not None:
             cover._reveal.close(on_done=surface.reveal_clock)
         else:
-            # No cover (hotplug while locked) — reveal clock immediately
             surface.reveal_clock()
-
-    # ------------------------------------------------------------------ #
-    #  Cleanup                                                             #
-    # ------------------------------------------------------------------ #
 
     def _remove_monitor(self, monitor: Gdk.Monitor):
         self._pending.discard(monitor)
@@ -419,16 +407,23 @@ class LockManager:
         self._covers.clear()
         self._pending.clear()
 
-
         GLib.idle_add(fabric.Application.get_default().quit)
 
 
 def lock():
-    return LockManager()
+    if __name__ != "__main__":
+        subprocess.Popen(
+            [sys.executable, __file__],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return None
+        
+    app = Application("lock")
+    app.set_stylesheet_from_file(os.path.expanduser("~/.config/caffyne-shell/style/style.css"))
+    manager = LockManager()
+    app.run()
 
 
 if __name__ == "__main__":
-    manager = LockManager()
-    app = Application("lock")
-    app.set_stylesheet_from_file(get_relative_path("./style/style.css"))
-    app.run()
+    lock()

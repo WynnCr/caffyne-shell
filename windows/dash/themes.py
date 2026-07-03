@@ -1,13 +1,12 @@
 from __future__ import annotations
 import threading
-
+import os
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.utils import get_relative_path
 from gi.repository import Gtk, GLib
 
-from snippets import Icon, AnimatedScroll, ClippingBox, SmoothSwitch, FlatScale
+from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale
 from services.singletons import theme_service
 from services.themes import WALLPAPER_THEME
 from user_options import user_options
@@ -427,6 +426,7 @@ class ThemePreview(Box):
 
     def _on_opacity_released(self, scale, event) -> None:
         value = round(scale.get_value(), 2)
+        print(value)
         user_options.theme.opacity = value
         user_options.save()
         theme_service.apply()
@@ -476,14 +476,13 @@ class ThemePreview(Box):
     def _write_border_css(self, key: str) -> None:
         values = RADIUS_MAP[key]
         css = "\n".join(f"@define {k} {v};" for k, v in values.items())
-        path = get_relative_path("../../style/borders.css")
+        path = os.path.expanduser("~/.config/caffyne-shell/style/borders.css")
         with open(path, "w") as f:
             f.write(css + "\n")
-
     def _write_font_css(self, key: str) -> None:
         values = FONT_MAP[key]
         css = "\n".join(f"@define {k} {v};" for k, v in values.items())
-        path = get_relative_path("../../style/fonts.css")
+        path = os.path.expanduser("~/.config/caffyne-shell/style/fonts.css")
         with open(path, "w") as f:
             f.write(css + "\n")
 
@@ -508,7 +507,7 @@ class DashThemePage(Box):
             spacing=12,
             style_classes=["wallpaper-thumb-strip"],
         )
-        self._scroll = AnimatedScroll(
+        self._scroll = ClippingScrolledWindow(
             v_expand=True,
             style_classes=["grid-selector-thumb-scroll"],
             max_content_size=(174, 630),

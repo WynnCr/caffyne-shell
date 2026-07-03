@@ -6,7 +6,7 @@ from gi.repository import GLib
 from loguru import logger
 from fabric.utils import get_relative_path
 from utils.session import SESSION_MANAGER
-
+import sys
 
 def _get_screen_commands() -> tuple[str, str]:
     """Return (screen_off_cmd, screen_on_cmd) for the running WM."""
@@ -33,7 +33,7 @@ def _get_screen_commands() -> tuple[str, str]:
         )
 
 
-LOCK_CMD = f"python3 {get_relative_path('../lockscreen.py')} &"
+LOCK_CMD = f"{sys.executable} {get_relative_path('../lockscreen.py')} &"
 SUSPEND_CMD = f"{SESSION_MANAGER} suspend"
 
 

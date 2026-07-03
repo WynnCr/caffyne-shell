@@ -14,7 +14,7 @@ from services.wm.mango.service import Mango
 from utils.session import SESSION_MANAGER
 from gi.repository import GLib
 from utils.sounds import play_sound
-
+from lockscreen import lock
 session_id = os.environ.get("XDG_SESSION_ID", "")
 
 
@@ -66,7 +66,7 @@ class ConfirmPage(AppletPage):
     def _execute(self):
         if self._play_sound:
             play_sound("session-quit")
-            GLib.timeout_add(500, lambda: [self._callback(), False])
+            GLib.timeout_add(1000, lambda: [self._callback(), False])
         else:
             self._callback()
 
@@ -123,10 +123,11 @@ class LogoutMenu(QSAppletPage):
                             label="Lock",
                             on_clicked=lambda *_: [
                                 self._parent.toggle(),
-                                subprocess.Popen(
-                                    f"python3 {get_relative_path('../../../lockscreen.py')}",
-                                    shell=True,
-                                ),
+                                # subprocess.Popen(
+                                #     f"python3 {get_relative_path('../../../lockscreen.py')}",
+                                #     shell=True,
+                                # ),
+                                lock()
                             ],
                         ),
                     ]),

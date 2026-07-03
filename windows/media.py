@@ -19,6 +19,84 @@ def format_time(seconds: float) -> str:
     secs = int(seconds) % 60
     return f"{mins:02d}:{secs:02d}"
 
+class NoMediaPlaceholder(Box):
+    def __init__(self, **kwargs):
+        album_placeholder = Overlay(
+            child=Box(style_classes=["player-art-placeholder"], style="min-width: 64px; min-height: 64px;"),
+            overlays=[Icon(icon_name="vinyl-record-duotone", icon_size=64)],
+        )
+
+        album_stack = Stack(children=[album_placeholder])
+
+        super().__init__(
+            orientation="v",
+            spacing=12,
+            children=[
+                Overlay(
+                    style_classes=["player-cover"],
+                    child=ClippingBox(
+                        style_classes=["player-cover-background"],
+                        children=Stack(children=[Box(style_classes=["player-cover-placeholder"])]),
+                    ),
+                    overlays=[
+                        CenterBox(
+                            orientation="v",
+                            center_children=ClippingBox(
+                                h_align="center",
+                                style="border-radius: 40px;",
+                                children=[album_stack],
+                            ),
+                            end_children=Box(
+                                orientation="v",
+                                h_align="start",
+                                style="margin: 16px;",
+                                spacing=8,
+                                children=[
+                                    Label(
+                                        label="No Media Playing",
+                                        h_align="start",
+                                        style="font-size: 14px; font-weight: bold;",
+                                        ellipsization="end",
+                                        max_chars_width=52,
+                                    ),
+                                ],
+                            ),
+                        )
+                    ],
+                ),
+                Box(
+                    spacing=12,
+                    h_align="fill",
+                    children=[
+                        Button(
+                            style_classes=["applet-misc-button"],
+                            child=Icon(icon_name="skip-back-duotone"),
+                            sensitive=False,
+                        ),
+                        FlatScale(
+                            style_classes=["scale"],
+                            h_align="fill",
+                            h_expand=True,
+                            min_value=0,
+                            max_value=100,
+                            value=0,
+                            sensitive=False,
+                        ),
+                        Button(
+                            style_classes=["applet-misc-button"],
+                            child=Icon(icon_name="skip-forward-duotone"),
+                            sensitive=False,
+                        ),
+                        Button(
+                            style_classes=["player-media-icon-button"],
+                            child=Icon(icon_name="play-duotone", style_classes=["player-media-icon"]),
+                            sensitive=False,
+                        ),
+                    ],
+                ),
+            ],
+            **kwargs,
+        )
 
 class MediaPlayer(Box):
     def __init__(self, name: str, service: PlayerService, applet: "MediaApplet", **kwargs):
@@ -157,12 +235,10 @@ class MediaPlayer(Box):
     def _on_track_position(self, service, position, total_duration=None):
         if self.position_scale._dragging:
             return
-
         if total_duration:
             self.position_scale._max_value = total_duration
-            
         self.position_scale.set_value(position)
-
+        
     def _on_meta_change(self, service, metadata, player):
         keys = metadata.keys()
         self.artist_label.set_label(
@@ -250,6 +326,8 @@ class MediaApplet(Box):
         self._players: dict[str, MediaPlayer] = {}
         self.player_stack = HackedStack(style_classes=["applet-stack"], bezier_curve=(0.34, 1.3, 0.64, 1.0), duration=0.45)
         self.switcher = PlayerStackSwitcher(self.player_stack)
+        self.no_media_placeholder = NoMediaPlaceholder()
+        self.player_stack.add_named(self.no_media_placeholder, "__placeholder__")
 
         super().__init__(
             style_classes=["applet-menu"],
@@ -287,10 +365,6 @@ class MediaApplet(Box):
         media = self._players.pop(name)
         self.player_stack.remove(media)
         media.destroy()
-        if self._players:
-            self.player_stack.set_visible_child_name(
-                list(self._players.keys())[-1]
-            )
         self.switcher.sync()
         self.sync()
 
@@ -306,14 +380,8 @@ class MediaApplet(Box):
 
     def sync(self):
         has_players = bool(self._players)
-        self.set_visible(has_players)
-
-        if not has_players:
-            parent = self.get_parent()
-            while parent is not None:
-                if hasattr(parent, '_keys'):
-                    if parent._keys == ["Media"] or len(parent._keys) <= 1:
-                        if parent.get_visible():
-                            parent.hide()
-                    break
-                parent = parent.get_parent()
+        if has_players:
+            self.player_stack.set_visible_child_name(list(self._players.keys())[-1])
+        else:
+            self.player_stack.set_visible_child_name("__placeholder__")
+        self.set_visible(True)

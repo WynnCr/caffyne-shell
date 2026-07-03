@@ -119,6 +119,15 @@ class Mango(WMService):
             active_tags: list[int] = m.get("active_tags", [])
             focused = m.get("active", False)
 
+            # If this is the focused monitor, check if the active tag has any clients
+            if focused:
+                active_tag_data = next(
+                    (t for t in m.get("tags", []) if t["index"] in active_tags), None
+                )
+                if active_tag_data and active_tag_data.get("client_count", 0) == 0:
+                    self._active_window_id = -1
+                    self._resolve_active_window()
+
             for tag in m.get("tags", []):
                 idx: int = tag["index"]
                 synth_id = _synth_workspace_id(monitor_name, idx)

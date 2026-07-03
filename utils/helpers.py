@@ -1,8 +1,58 @@
 import shutil
-from gi.repository import GioUnix, Gtk, GdkPixbuf, GLib
+from gi.repository import GioUnix, Gtk, GdkPixbuf, GLib, Gio
 from PIL import Image as PILImage, ImageEnhance, ImageFilter
 import io
 from snippets import enable_blur, set_blur_regions_from_widget
+
+import threading
+
+_icon_cache: dict[str, str] = {}
+_cache_lock = threading.Lock()
+_cache_built = False
+
+def _build_cache() -> None:
+    global _cache_built
+    cache = {}
+    for app in Gio.AppInfo.get_all():
+        gio_icon = app.get_icon()
+        if not gio_icon:
+            continue
+        icon_str = gio_icon.to_string()
+        
+        desktop_id = (app.get_id() or "").lower().removesuffix(".desktop")
+        app_name = (app.get_name() or "").lower()
+        executable = (app.get_executable() or "").split("/")[-1].lower()
+
+        for key in [desktop_id, app_name, executable]:
+            if key and key not in cache:
+                cache[key] = icon_str
+        
+        # Also index the last segment of reverse-DNS IDs (org.gnome.Nautilus -> nautilus)
+        if "." in desktop_id:
+            short = desktop_id.split(".")[-1]
+            if short and short not in cache:
+                cache[short] = icon_str
+
+    with _cache_lock:
+        _icon_cache.update(cache)
+        _cache_built = True
+
+# Build cache once in a background thread at import time
+threading.Thread(target=_build_cache, daemon=True).start()
+
+def get_app_icon_name(app_id: str) -> str | None:
+    if not app_id:
+        return None
+    
+    app_id_lower = app_id.lower()
+    short = app_id.split(".")[-1].lower()
+
+    with _cache_lock:
+        return (
+            _icon_cache.get(app_id_lower)
+            or _icon_cache.get(short)
+            or _icon_cache.get("-".join(app_id.split(".")).lower())
+        )
 
 def popup_with_blur(menu: Gtk.Menu, event, accuracy: int = 1):
     blur_ctx = None
@@ -24,30 +74,6 @@ def executable_exists(executable_name):
     executable_path = shutil.which(executable_name)
     return bool(executable_path)
 
-def get_app_icon_name(app_id: str) -> str | None:
-    """
-    Try to resolve an app icon name from a Niri app_id.
-    Attempts several common transformations before giving up.
-    """
-    candidates = [
-        app_id,
-        app_id.lower(),
-        app_id.split(".")[-1],
-        app_id.split(".")[-1].lower(),
-        "-".join(app_id.split(".")).lower(),
-    ]
-
-    for candidate in candidates:
-        try:
-            app_info = GioUnix.DesktopAppInfo.new(candidate + ".desktop")
-            if app_info:
-                icon = app_info.get_string("Icon")
-                if icon:
-                    return icon
-        except TypeError:
-            continue
-
-    return None
 
 def load_blurred_pixbuf(
     path: str,
