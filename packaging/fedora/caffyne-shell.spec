@@ -6,18 +6,27 @@ Summary:        A modern, GTK-based desktop shell built on top of Fabric
 License:        GPL-3.0-only
 URL:            https://github.com/caffyne-org/caffyne-shell
 Source0:        %{name}-%{version}.tar.gz
+Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/master.tar.gz#/fabric-master.tar.gz
+Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
 
 BuildArch:      x86_64
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools
 BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  wayland-devel
 BuildRequires:  gtk3-devel
+BuildRequires:  golang
+BuildRequires:  meson
+BuildRequires:  ninja-build
+
+Provides:       python3-fabric = 0.0.2
+Provides:       fabric-cli = 0.0.2
 
 # Python dependencies
-Requires:       python3-fabric
-Requires:       fabric-cli
 Requires:       python3-cffi
 Requires:       python3-click
 Requires:       python3-loguru
@@ -53,9 +62,10 @@ caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Pytho
 It features a highly customizable drag-and-drop panel, fluid animations, and deeply integrated system applets designed specifically for modern Wayland compositors.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{name}-%{version} -a 1 -a 2
 
 %build
+# Compile native snippets
 pushd snippets/blur/lib
 make %{?_smp_mflags}
 popd
@@ -64,22 +74,51 @@ pushd snippets/hacktk/lib
 make %{?_smp_mflags}
 popd
 
-%install
-mkdir -p %{buildroot}/usr/share/caffyne-shell
-mkdir -p %{buildroot}/usr/bin
+# Build Fabric CLI
+pushd fabric-cli-main
+%meson
+%meson_build
+popd
 
+# Build Fabric Python package
+pushd fabric-master
+pip3 wheel --no-deps --wheel-dir dist .
+popd
+
+%install
+# Create application directories
+mkdir -p %{buildroot}/usr/share/caffyne-shell
+mkdir -p %{buildroot}%{_bindir}
+
+# Install Caffyne Shell
 cp -r assets bar_widgets config greetd icons lightdm matugen services snippets sounds style svgs themes utils wallpapers windows bar.py lockscreen.py main.py plugin_loader.py user_options.py %{buildroot}/usr/share/caffyne-shell/
 
-cp packaging/fedora/startcaffyneshell %{buildroot}/usr/bin/startcaffyneshell
-chmod +x %{buildroot}/usr/bin/startcaffyneshell
+# Copy the wrapper script
+cp packaging/fedora/startcaffyneshell %{buildroot}%{_bindir}/startcaffyneshell
+chmod +x %{buildroot}%{_bindir}/startcaffyneshell
 
+# Fix permissions on shared libraries
 chmod +x %{buildroot}/usr/share/caffyne-shell/snippets/blur/lib/libblur.so
 chmod +x %{buildroot}/usr/share/caffyne-shell/snippets/hacktk/lib/libhacktk.so
 
+# Install Fabric CLI
+pushd fabric-cli-main
+%meson_install
+popd
+
+# Install Fabric Python package
+pushd fabric-master
+pip3 install --no-index --no-deps --root %{buildroot} --prefix /usr dist/*.whl
+popd
+
 %files
 /usr/share/caffyne-shell/
-/usr/bin/startcaffyneshell
+%{_bindir}/startcaffyneshell
+%{_bindir}/fabric-cli
+/usr/lib*/python3.*/site-packages/fabric/
+/usr/lib*/python3.*/site-packages/fabric-*.dist-info/
 
 %changelog
 * Fri Jul 03 2026 Maintainer <amritanshukumar13012008@gmail.com> - 1.0.0-1
 - First packaging for Fedora COPR.
+- Bundled fabric and fabric-cli into the monolithic package.
