@@ -9,7 +9,6 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/master.tar.gz#/fabric-master.tar.gz
 Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
 
-BuildArch:      x86_64
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
@@ -86,14 +85,12 @@ pip3 wheel --no-deps --wheel-dir dist .
 popd
 
 %install
-# Create application directories
+# Create directories
 mkdir -p %{buildroot}/usr/share/caffyne-shell
 mkdir -p %{buildroot}%{_bindir}
 
-# Install Caffyne Shell
 cp -r assets bar_widgets config greetd icons lightdm matugen services snippets sounds style svgs themes utils wallpapers windows bar.py lockscreen.py main.py plugin_loader.py user_options.py %{buildroot}/usr/share/caffyne-shell/
 
-# Copy the wrapper script
 cp packaging/fedora/startcaffyneshell %{buildroot}%{_bindir}/startcaffyneshell
 chmod +x %{buildroot}%{_bindir}/startcaffyneshell
 
@@ -106,7 +103,7 @@ pushd fabric-cli-main
 %meson_install
 popd
 
-# Install Fabric Python package
+# Install Fabric package
 pushd fabric-master
 pip3 install --no-index --no-deps --root %{buildroot} --prefix /usr dist/*.whl
 popd
