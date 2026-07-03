@@ -6,7 +6,7 @@ Summary:        A modern, GTK-based desktop shell built on top of Fabric
 License:        GPL-3.0-only
 URL:            https://github.com/caffyne-org/caffyne-shell
 Source0:        https://github.com/WynnCr/caffyne-shell/archive/refs/heads/main.tar.gz#/caffyne-shell-1.0.0.tar.gz
-Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/master.tar.gz#/fabric-master.tar.gz
+Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/main.tar.gz#/fabric-main.tar.gz
 Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
 
 
@@ -82,7 +82,7 @@ pushd fabric-cli-main
 popd
 
 # Build Fabric Python package
-pushd fabric-master
+pushd fabric-main
 pip3 wheel --no-deps --wheel-dir dist .
 popd
 
@@ -106,7 +106,7 @@ pushd fabric-cli-main
 popd
 
 # Install Fabric package
-pushd fabric-master
+pushd fabric-main
 pip3 install --no-index --no-deps --root %{buildroot} --prefix /usr dist/*.whl
 popd
 
