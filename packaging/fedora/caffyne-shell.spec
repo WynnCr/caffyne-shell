@@ -61,7 +61,9 @@ caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Pytho
 It features a highly customizable drag-and-drop panel, fluid animations, and deeply integrated system applets designed specifically for modern Wayland compositors.
 
 %prep
-%autosetup -n caffyne-shell-main -a 1 -a 2
+%setup -q -n caffyne-shell-main
+%setup -q -T -D -a 1 -n caffyne-shell-main
+%setup -q -T -D -a 2 -n caffyne-shell-main
 
 %build
 # Compile native snippets
