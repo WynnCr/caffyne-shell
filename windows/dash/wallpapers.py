@@ -13,7 +13,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.image import Image
 from fabric.widgets.centerbox import CenterBox
 from gi.repository import GdkPixbuf, GLib, Gio
-from snippets import Icon, AnimatedScroll, ClippingBox
+from snippets import Icon, ClippingScrolledWindow, ClippingBox
 from services.themes import wallpaper
 from PIL import Image as PilImage
 
@@ -195,7 +195,7 @@ class DashSelectorPage(Box):
             spacing=12,
             style_classes=["wallpaper-thumb-strip"],
         )
-        self._scroll = AnimatedScroll(
+        self._scroll = ClippingScrolledWindow(
             v_expand=True,
             style_classes=["grid-selector-thumb-scroll"],
             max_content_size=(174, 630),

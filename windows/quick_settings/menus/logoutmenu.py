@@ -66,7 +66,7 @@ class ConfirmPage(AppletPage):
     def _execute(self):
         if self._play_sound:
             play_sound("session-quit")
-            GLib.timeout_add(500, lambda: [self._callback(), False])
+            GLib.timeout_add(1000, lambda: [self._callback(), False])
         else:
             self._callback()
 

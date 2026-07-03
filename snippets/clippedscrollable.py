@@ -2,9 +2,20 @@ import math
 import cairo
 from typing import cast
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import GLib
+from gi.repository import GLib, Gdk
+
+
 class ClippingScrolledWindow(ScrolledWindow):
-    """A ScrolledWindow that respects border-radius like `overflow: hidden`."""
+    """A ScrolledWindow that respects border-radius like `overflow: hidden`,
+    with rubber-band bounce scrolling at boundaries."""
+
+    # Bounce tuning constants
+    BOUNCE_SPRING = 0.15     # Spring-back speed per tick (0.0–1.0, lower = bouncier)
+    BOUNCE_THRESHOLD = 0.4   # Pixels from 0 at which we snap and stop
+    BOUNCE_FPS = 14          # Tick interval in ms (lower = smoother)
+    MAX_OVERSHOOT = 60       # Max pixels of visual overshoot allowed
+    OVERSHOOT_SCALE = 20     # Pixels of overshoot per scroll delta unit
+    BOUNDARY_EPSILON = 1.0   # Float tolerance for bottom boundary detection
 
     @staticmethod
     def render_shape(cr: cairo.Context, width: int, height: int, radius: int = 0):
@@ -33,14 +44,95 @@ class ClippingScrolledWindow(ScrolledWindow):
             ),
         )
         cr.clip()
+
+        # Apply bounce offset purely at draw time — no layout changes at all
+        if self._overshoot_offset != 0.0:
+            cr.translate(0, self._overshoot_offset)
+
         ScrolledWindow.do_draw(self, cr)
         cr.restore()
         return True
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self._bounce_id = None
+        self._overshoot_offset = 0.0
+        self._is_bouncing = False
+        self._bounce_velocity = 0.0
+
         self.connect("map", self._on_map)
+        self.connect("scroll-event", self._on_scroll_event)
 
     def _on_map(self, _):
         self.set_overlay_scrolling(False)
         self.set_overlay_scrolling(True)
+
+    def _on_scroll_event(self, widget, event: Gdk.EventScroll):
+        adj = self.get_vadjustment()
+        if not adj:
+            return False
+
+        lower = adj.get_lower()
+        upper = adj.get_upper() - adj.get_page_size()
+        val = adj.get_value()
+
+        if upper <= lower:
+            return False
+
+        ok, dx, dy = event.get_scroll_deltas()
+
+        if not ok or (dx == 0.0 and dy == 0.0):
+            if event.direction == Gdk.ScrollDirection.UP:
+                dy = -1.0
+            elif event.direction == Gdk.ScrollDirection.DOWN:
+                dy = 1.0
+            else:
+                return False
+
+        at_top = val <= lower and dy < 0
+        at_bottom = val >= upper - self.BOUNDARY_EPSILON and dy > 0
+
+        if at_top or at_bottom:
+            self._bounce_velocity += dy * -8  # kick velocity instead of offset directly
+            self._start_bounce()
+            return True
+        if self._is_bouncing:
+            self._stop_bounce()
+
+        return False
+
+    def _start_bounce(self):
+        self._is_bouncing = True
+        if self._bounce_id is None:
+            self._bounce_id = GLib.timeout_add(self.BOUNCE_FPS, self._bounce_tick)
+
+    def _stop_bounce(self):
+        if self._bounce_id is not None:
+            GLib.source_remove(self._bounce_id)
+            self._bounce_id = None
+        self._overshoot_offset = 0.0
+        self._is_bouncing = False
+        self.queue_draw()
+
+    def _bounce_tick(self) -> bool:
+        # Apply velocity to offset
+        self._overshoot_offset += self._bounce_velocity
+        # Decay velocity (friction)
+        self._bounce_velocity *= 0.75
+        # Spring offset back to 0
+        self._overshoot_offset *= (1.0 - self.BOUNCE_SPRING)
+
+        # Clamp overshoot
+        self._overshoot_offset = max(-self.MAX_OVERSHOOT, min(self.MAX_OVERSHOOT, self._overshoot_offset))
+
+        if abs(self._overshoot_offset) < self.BOUNCE_THRESHOLD and abs(self._bounce_velocity) < 0.1:
+            self._overshoot_offset = 0.0
+            self._bounce_velocity = 0.0
+            self._bounce_id = None
+            self._is_bouncing = False
+            self.queue_draw()
+            return GLib.SOURCE_REMOVE
+
+        self.queue_draw()
+        return GLib.SOURCE_CONTINUE

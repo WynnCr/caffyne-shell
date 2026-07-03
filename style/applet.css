@@ -16,6 +16,15 @@
     transition: background-color 0.3s ease;
 }
 
+.applet-misc-button.active {
+    background-color: var(--primary);
+}
+
+.applet-misc-button.active * {
+    color: var(--on_primary);
+    transition: color 0.3s ease;
+}
+
 .applet-header {
     min-height: 36px;
 }

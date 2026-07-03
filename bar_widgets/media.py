@@ -63,9 +63,18 @@ class Media(Box):
             ],
         )
 
+        self.placeholder = Box(
+            spacing=4,
+            visible=False,
+            style_classes=["bar-button"],
+            children=[
+                Icon(icon_name="music-notes-duotone"),
+            ],
+        )
+
         super().__init__(
             spacing=4,
-            children=[self.edit_overlay, self._stack],
+            children=[self.edit_overlay, self.placeholder, self._stack],
             **kwargs,
         )
 
@@ -111,7 +120,9 @@ class Media(Box):
 
         self._stack.set_visible(has_players)
         self.edit_overlay.set_visible(is_editing and not has_players)
+        self.placeholder.set_visible(not has_players and not is_editing)
+
         if len(self.get_parent().get_parent().get_children()) > 1:
-            self.get_parent().set_visible(has_players or is_editing)
+            self.get_parent().set_visible(True)
         else:
-            self.get_parent().get_parent().set_visible(has_players or is_editing)
+            self.get_parent().get_parent().set_visible(True)

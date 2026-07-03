@@ -24,7 +24,7 @@ class BaseButton(EventBox):
         self._icon = icon
         self._label_widget = Label(label=label)
         self._variant = variant
-        self._label_widget.set_yalign(0.55)
+        # self._label_widget.set_yalign(0.55)
         style_classes = ["bar-button", VARIANT_CSS.get(variant, "variant-icon-label")]
 
         if variant == VARIANT_LABEL:
@@ -56,7 +56,7 @@ class ProgressButton(Box):
                 size=32, icon_size=16, icon_size_standalone=16, line_width=2, **kwargs):
         self._variant = variant
         self._label_widget = Label(label=label)
-        self._label_widget.set_yalign(0.55)
+        # self._label_widget.set_yalign(0.55)
         self.scale = None
 
         if callable(icon):
@@ -127,7 +127,7 @@ class StatButton(Box):
                 size=32, icon_size=16, icon_size_standalone=16, line_width=2, **kwargs):
         self._variant = variant
         self._label_widget = Label(label=label)
-        self._label_widget.set_yalign(0.55)
+        # self._label_widget.set_yalign(0.55)
         self.scale = None
         self._scroll_accumulator = 0.0
 

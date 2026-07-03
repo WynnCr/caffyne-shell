@@ -28,8 +28,14 @@
 
         nativeLibs = with pkgs; [
           gtk3
+          glib
+          pango
           gtk-layer-shell
           cairo
+          gtk-session-lock
+          harfbuzz
+          atk
+          playerctl
           gobject-introspection
           libdbusmenu-gtk3
           gdk-pixbuf

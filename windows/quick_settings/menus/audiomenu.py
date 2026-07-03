@@ -11,7 +11,7 @@ class StreamItem(Box):
         self.checkmark = Icon(
             icon_name="check-circle-duotone",
             icon_size=16,
-            style_classes=["qs-checkmark-active"] if self._is_default(stream) else [],
+            # style_classes=["qs-checkmark-active"] if self._is_default(stream) else [],
         )
 
         self.slider = SliderBox(
@@ -51,6 +51,7 @@ class StreamItem(Box):
 
         audio.connect("speaker-changed", lambda *_: self._update_checkmark(stream))
         audio.connect("microphone-changed", lambda *_: self._update_checkmark(stream))
+        self._update_checkmark(stream)
 
     def _is_default(self, stream) -> bool:
         if stream.type == "speakers":
@@ -61,9 +62,9 @@ class StreamItem(Box):
 
     def _update_checkmark(self, stream):
         if self._is_default(stream):
-            self.checkmark.add_style_class("qs-checkmark-active")
+            self.slider.icon_button.add_style_class("active")
         else:
-            self.checkmark.remove_style_class("qs-checkmark-active")
+            self.slider.icon_button.remove_style_class("active")
 
 def _make_output_box():
     box = Box(orientation="v", spacing=12)
