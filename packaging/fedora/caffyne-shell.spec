@@ -63,7 +63,7 @@ Requires:       upower
 Requires:       NetworkManager
 Requires:       bluez
 Requires:       swayidle
-
+Requires:       gtk-session-lock
 %description
 caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Python, and GTK.
 It features a highly customizable drag-and-drop panel, fluid animations, and deeply integrated system applets designed specifically for modern Wayland compositors.
