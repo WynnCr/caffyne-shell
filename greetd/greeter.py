@@ -334,7 +334,10 @@ if __name__ == "__main__":
     manager = GreeterManager(client, users, sessions)
 
     app = Application("greeter", manager.primary_window)
-    app.set_stylesheet_from_file(get_relative_path("./style/style.css"))
+    import os
+    style_dir = os.environ.get("CAFFYNE_STYLE_DIR", get_relative_path("./style"))
+    style_file = os.path.join(style_dir, "style.css")
+    app.set_stylesheet_from_file(style_file)
 
     try:
         app.run()

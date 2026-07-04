@@ -476,14 +476,18 @@ class ThemePreview(Box):
     def _write_border_css(self, key: str) -> None:
         values = RADIUS_MAP[key]
         css = "\n".join(f"@define {k} {v};" for k, v in values.items())
-        path = get_relative_path("../../style/borders.css")
+        import os
+        style_dir = os.environ.get("CAFFYNE_STYLE_DIR", get_relative_path("../../style"))
+        path = os.path.join(style_dir, "borders.css")
         with open(path, "w") as f:
             f.write(css + "\n")
 
     def _write_font_css(self, key: str) -> None:
         values = FONT_MAP[key]
         css = "\n".join(f"@define {k} {v};" for k, v in values.items())
-        path = get_relative_path("../../style/fonts.css")
+        import os
+        style_dir = os.environ.get("CAFFYNE_STYLE_DIR", get_relative_path("../../style"))
+        path = os.path.join(style_dir, "fonts.css")
         with open(path, "w") as f:
             f.write(css + "\n")
 
