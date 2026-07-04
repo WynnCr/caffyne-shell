@@ -67,7 +67,8 @@ It features a highly customizable drag-and-drop panel, fluid animations, and dee
 %setup -q -T -D -a 1 -n caffyne-shell-main
 %setup -q -T -D -a 2 -n caffyne-shell-main
 
-%patch -P0 -p0 -d fabric-main
+%patch -P0 -p1 -d fabric-main
+
 
 
 %build
