@@ -120,6 +120,8 @@ popd
 /usr/share/zsh/site-functions/_fabric-cli
 /usr/lib*/python3.*/site-packages/fabric/
 /usr/lib*/python3.*/site-packages/fabric-*.dist-info/
+/usr/lib*/python3.*/site-packages/thefuzz/
+/usr/lib*/python3.*/site-packages/thefuzz-*.dist-info/
 
 %changelog
 * Fri Jul 03 2026 Maintainer <amritanshukumar13012008@gmail.com> - 1.0.0-1
