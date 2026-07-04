@@ -7,14 +7,14 @@ from snippets import Applet, AppletPage, Icon, AnimatedScroll, StyleAwareEntry
 from utils.dispatch import dispatch_app
 from gi.repository import Gdk, GLib
 from thefuzz import process, fuzz
-from fabric.utils import get_desktop_applications, get_relative_path, DesktopApp
+from fabric.utils import get_desktop_applications, DesktopApp
 from fabric.widgets.grid import Grid
 from user_options import user_options
 import threading
 import json
 import os
 
-USAGE_FILE = get_relative_path("../config/launcher_usage.json")
+USAGE_FILE = os.path.expanduser("~/.config/caffyne-shell/config/launcher_usage.json")
 
 def load_usage() -> dict:
     try:
@@ -168,7 +168,7 @@ class LauncherApplet(Applet):
         self.window = parent
         self._all_apps = get_desktop_applications()
         self._grid_mode = user_options.launcher.grid
-
+        self._load_generation = 0
         self._list_box = Box(orientation="v", spacing=6)
         self._grid_box = Box(orientation="v", spacing=6)
 
@@ -236,13 +236,14 @@ class LauncherApplet(Applet):
                 child=results,
             )
         )
+
         self.connect("realize", self._on_realize)
         self._entry.connect("key-press-event", self._on_entry_key_press)
         self._load_async(self._sorted_by_usage(self._all_apps[:16]), self._grid_mode)
 
+
     def _on_realize(self, *_):
         GLib.idle_add(lambda: self._view_stack.set_visible_child_name("grid" if self._grid_mode else "list"))
-        self._load_async(self._sorted_by_usage(self._all_apps[:16]), self._grid_mode)
         self.window.connect("notify::visible", self._on_visibility_changed)
         self.window.connect("key-press-event", self._on_key_press)
 
@@ -250,6 +251,10 @@ class LauncherApplet(Applet):
         self._grid_mode = not self._grid_mode
         user_options.launcher.grid = self._grid_mode
         user_options.save()
+        for child in self._list_box.get_children():
+            child.destroy()
+        for child in self._grid_box.get_children():
+            child.destroy()
         icon = "list-dashes-duotone" if self._grid_mode else "squares-four-duotone"
         self._view_toggle_icon.set_icon_name(icon)
         self._view_stack.set_visible_child_name("grid" if self._grid_mode else "list")
@@ -321,29 +326,52 @@ class LauncherApplet(Applet):
                 self._list_box.add(LauncherAppItem(app, self.window))
             self._list_box.show_all()
 
+
     def _load_async(self, apps, grid_mode):
+        self._load_generation += 1
+        generation = self._load_generation
+
         def load():
             if grid_mode:
                 grid = Grid(column_homogeneous=True, column_spacing=6, row_spacing=6)
                 grid.attach_flow([LauncherGridItem(a, self.window) for a in apps], columns=3)
                 grid.show_all()
-                GLib.idle_add(self._grid_box.add, grid)
+
+                def commit_grid():
+                    if generation != self._load_generation:
+                        grid.destroy()
+                        return
+                    for child in self._grid_box.get_children():
+                        child.destroy()
+                    self._grid_box.add(grid)
+                    self._app_count.label = f"Apps · {len(apps)}"
+
+                GLib.idle_add(commit_grid)
             else:
                 items = [LauncherAppItem(a, self.window) for a in apps]
-                def add_items():
+
+                def commit_list():
+                    if generation != self._load_generation:
+                        for item in items:
+                            item.destroy()
+                        return
+                    for child in self._list_box.get_children():
+                        child.destroy()
                     for item in items:
                         self._list_box.add(item)
                     self._list_box.show_all()
-                GLib.idle_add(add_items)
+                    self._app_count.label = f"Apps · {len(apps)}"
+
+                GLib.idle_add(commit_list)
+
         threading.Thread(target=load, daemon=True).start()
 
     def _search(self, query: str):
         if not query:
-            self._render_apps(self._sorted_by_usage(self._all_apps))
+            self._load_async(self._sorted_by_usage(self._all_apps), self._grid_mode)
             return
 
         usage = load_usage()
-
         raw_results = process.extract(
             query,
             self._all_apps,
@@ -351,18 +379,12 @@ class LauncherApplet(Applet):
             scorer=fuzz.WRatio,
             limit=50,
         )
-
         filtered = [(app, score) for app, score in raw_results if score >= 60]
-
         boosted = sorted(
             filtered,
-            key=lambda pair: (
-                round(pair[1] / 5) * 10,
-                get_usage_count(pair[0], usage),
-            ),
+            key=lambda pair: (round(pair[1] / 5) * 10, get_usage_count(pair[0], usage)),
             reverse=True,
         )
-
         adj = self._scrolled_window.get_vadjustment()
         adj.set_value(adj.get_lower())
-        self._render_apps([app for app, _ in boosted])
+        self._load_async([app for app, _ in boosted], self._grid_mode)

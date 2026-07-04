@@ -1,3 +1,4 @@
+from __future__ import annotations
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.widgets.box import Box

@@ -75,10 +75,10 @@
 
 .qs-button-label {
     border-radius: apply(radius-m) 0 0 apply(radius-m);
-    min-width: 99px;
+    min-width: 109px;
     min-height: 14px;
     background-color: var(--surface_container);
-    padding: 6px 10px;
+    padding: 6px 0px 6px 10px;
     transition: 0.3s ease;
 }
 
@@ -246,16 +246,6 @@
 
 .qs-menu-disconnect-button label {
     font-size: 11px;
-}
-
-.qs-checkmark-active {
-    color: var(--primary);
-    transition: color 0.3s ease;
-}
-
-.qs-checkmark-active * {
-    color: var(--primary);
-    transition: color 0.3s ease;
 }
 
 .qs-kb-menu-button {

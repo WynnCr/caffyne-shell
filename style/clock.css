@@ -15,6 +15,14 @@
     transition: 0.3s ease;
 }
 
+.clock-timer-widget-button.active {
+    background-color: var(--primary);
+}
+
+.clock-timer-widget-button.active:hover {
+    background-color: mix(var(--primary), var(--on_primary_container), 0.2);
+}
+
 .clock-label {
     font-size: 20px;
     font-weight: 600;

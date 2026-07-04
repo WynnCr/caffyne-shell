@@ -29,7 +29,11 @@ class SliderBox(Box):
         )
         self.scale.connect("value-changed", lambda s: on_scale_change(s))
         self.scale.connect("scroll-event", self.on_scroll)
-
+        self.icon_button = Button(
+            style_classes=["applet-misc-button"],
+            child=right_icon,
+            on_clicked=lambda *_: on_right_click() if on_right_click else None,
+        ) if right_icon else Button()
         super().__init__(
             spacing=12,
             children=[
@@ -41,11 +45,7 @@ class SliderBox(Box):
 
                 self.scale,
 
-                Button(
-                    style_classes=["applet-misc-button"],
-                    child=right_icon,
-                    on_clicked=lambda *_: on_right_click() if on_right_click else None,
-                ) if right_icon else Button(),
+                self.icon_button
             ],
             **kwargs,
         )

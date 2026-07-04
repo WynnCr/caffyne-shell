@@ -12,7 +12,7 @@ class StyleService(Service):
         self.app = app
         self._style_changed = False
 
-        style_dir = os.environ.get("CAFFYNE_STYLE_DIR", get_relative_path("../style"))
+        style_dir = os.environ.get("CAFFYNE_STYLE_DIR", os.path.expanduser("~/.config/caffyne-shell/style"))
         self.style_monitor = monitor_file(style_dir)
         self.style_monitor.connect("changed", lambda *_: self.reload())
 

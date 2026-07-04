@@ -7,13 +7,13 @@ import threading
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, Future
 
-from fabric.utils import get_relative_path, monitor_file
+from fabric.utils import monitor_file
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.image import Image
 from fabric.widgets.centerbox import CenterBox
 from gi.repository import GdkPixbuf, GLib, Gio
-from snippets import Icon, AnimatedScroll, ClippingBox
+from snippets import Icon, ClippingScrolledWindow, ClippingBox
 from services.themes import wallpaper
 from PIL import Image as PilImage
 
@@ -195,7 +195,7 @@ class DashSelectorPage(Box):
             spacing=12,
             style_classes=["wallpaper-thumb-strip"],
         )
-        self._scroll = AnimatedScroll(
+        self._scroll = ClippingScrolledWindow(
             v_expand=True,
             style_classes=["grid-selector-thumb-scroll"],
             max_content_size=(174, 630),
@@ -320,7 +320,7 @@ class DashWallpaperPage(DashSelectorPage):
         self._preview_image.set_from_pixbuf(None)
 
     def _load_wallpapers(self) -> None:
-        walls_dir = get_relative_path("../../wallpapers")
+        walls_dir = os.path.expanduser("~/.config/caffyne-shell/wallpapers")
         if not os.path.isdir(walls_dir):
             return
 

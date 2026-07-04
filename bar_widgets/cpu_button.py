@@ -2,7 +2,9 @@ from .base import ProgressButton
 from snippets import Icon
 from fabric.utils import invoke_repeater
 import psutil
- 
+import threading
+from gi.repository import GLib
+
 class CPUIndicatorButton(ProgressButton):
     """Circular variant — scale with icon inside + optional percent label."""
     def __init__(self, monitor_id, vertical, variant=None, **kwargs):
@@ -12,10 +14,15 @@ class CPUIndicatorButton(ProgressButton):
             variant=variant or "icon+label",
             **kwargs,
         )
-        invoke_repeater(1_000, self._update)
- 
-    def _update(self):
-        cpu = psutil.cpu_percent()
-        self._update_label(f"{round(cpu)}%")
-        self._update_value(round(cpu))
-        return True
+        self._cpu = 0.0
+        threading.Thread(target=self._poll, daemon=True).start()
+
+    def _poll(self):
+        while True:
+            self._cpu = psutil.cpu_percent(interval=1.0)
+            GLib.idle_add(self._apply)
+
+    def _apply(self):
+        self._update_label(f"{round(self._cpu)}%")
+        self._update_value(round(self._cpu))
+        return False
