@@ -25,6 +25,11 @@ BuildRequires:  ninja-build
 Provides:       python3-fabric = 0.0.2
 Provides:       fabric-cli = 0.0.2
 
+%global __requires_exclude ^python3.*dist.*$
+
+# FHS workaround for python modules, I really hate non FHS stuff on nixos
+%global __os_install_post %{nil}
+
 # Python dependencies
 Requires:       python3-cffi
 Requires:       python3-click
@@ -32,13 +37,12 @@ Requires:       python3-loguru
 Requires:       python3-pam
 Requires:       python3-pillow
 Requires:       python3-psutil
-Requires:       python3-pycairo
+Requires:       python3-cairo
 Requires:       python3-pycparser
 Requires:       python3-gobject
 Requires:       python3-rapidfuzz
 Requires:       python3-setproctitle
 Requires:       python3-six
-Requires:       python3-thefuzz
 
 # System packages
 Requires:       gtk-layer-shell
@@ -52,9 +56,6 @@ Requires:       wf-recorder
 Requires:       upower
 Requires:       NetworkManager
 Requires:       bluez
-
-# FHS workaround for python modules, I really hate non FHS stuff on nixos
-%global __os_install_post %{nil}
 
 %description
 caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Python, and GTK.
@@ -81,9 +82,9 @@ pushd fabric-cli-main
 %meson_build
 popd
 
-# Build Fabric Python package
+# Build Fabric Python package and bundle missing PyPI dependencies
 pushd fabric-main
-pip3 wheel --no-deps --wheel-dir dist .
+pip3 wheel --no-deps --wheel-dir dist . thefuzz==0.22.1
 popd
 
 %install
