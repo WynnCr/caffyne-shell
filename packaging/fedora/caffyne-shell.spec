@@ -25,6 +25,7 @@ BuildRequires:  meson
 BuildRequires:  ninja-build
 BuildRequires:  rust
 BuildRequires:  cargo
+BuildRequires:  lz4-devel
 
 Provides:       python3-fabric = 0.0.2
 Provides:       fabric-cli = 0.0.2
