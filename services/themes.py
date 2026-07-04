@@ -299,6 +299,13 @@ class ThemeService(Service):
         mode        = "dark" if self._is_dark else "light"
         active_name = self._dark_theme if self._is_dark else self._light_theme
         try:
+            config_dir = os.path.expanduser("~/.config/caffyne-shell")
+            matugen_conf = os.path.join(config_dir, "matugen/config.toml")
+            os.makedirs(os.path.dirname(matugen_conf), exist_ok=True)
+            with open(matugen_conf, "w") as f:
+                f.write(f"[config]\nset_wallpaper = false\n\n[templates.caffyne]\ninput_path = '{config_dir}/matugen/caffyne-shell-colors.css'\noutput_path = '{config_dir}/style/colors.css'\n")
+
+
             if active_name == WALLPAPER_THEME:
                 wp_path = (
                     self._wallpaper_service.wallpaper_path

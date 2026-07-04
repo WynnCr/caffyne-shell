@@ -1,6 +1,6 @@
 Name:           caffyne-shell
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A modern, GTK-based desktop shell built on top of Fabric
 
 License:        GPL-3.0-only
