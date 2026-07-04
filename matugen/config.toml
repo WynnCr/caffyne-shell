@@ -1,0 +1,6 @@
+[config]
+set_wallpaper = false
+
+[templates.caffyne]
+input_path = '~/.config/caffyne-shell/matugen/caffyne-shell-colors.css'
+output_path = '~/.config/caffyne-shell/style/colors.css'

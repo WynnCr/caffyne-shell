@@ -308,8 +308,9 @@ class ThemeService(Service):
                 if not wp_path or not os.path.isfile(wp_path):
                     logger.warning("[ThemeService] no wallpaper set, cannot apply Matugen mode")
                     return GLib.SOURCE_REMOVE
+                matugen_conf = os.path.expanduser("~/.config/caffyne-shell/matugen/config.toml")
                 cmd = [
-                    "matugen", "image", wp_path,
+                    "matugen", "-c", matugen_conf, "image", wp_path,
                     "-m", mode,
                     "-t", self._scheme_type,
                     "--source-color-index", "0",
@@ -330,7 +331,8 @@ class ThemeService(Service):
                     json.dump(matugen_json, f, indent=2)
                 logger.info(f"[ThemeService] wrote theme JSON → {CACHE_THEME_PATH}")
 
-                cmd = ["matugen", "json", CACHE_THEME_PATH, "-m", mode, "--opacity", str(user_options.theme.opacity)]
+                matugen_conf = os.path.expanduser("~/.config/caffyne-shell/matugen/config.toml")
+                cmd = ["matugen", "-c", matugen_conf, "json", CACHE_THEME_PATH, "-m", mode, "--opacity", str(user_options.theme.opacity)]
 
             logger.info(f"[ThemeService] running: {' '.join(cmd)}")
             subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -8,6 +8,7 @@ URL:            https://github.com/caffyne-org/caffyne-shell
 Source0:        https://github.com/WynnCr/caffyne-shell/archive/refs/heads/main.tar.gz#/caffyne-shell-1.0.0.tar.gz
 Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/main.tar.gz#/fabric-main.tar.gz
 Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
+Source3:        https://codeberg.org/LGFae/awww/archive/main.tar.gz#/awww-main.tar.gz
 Patch0:         fabric-pygobject.patch
 
 
@@ -22,6 +23,8 @@ BuildRequires:  gtk3-devel
 BuildRequires:  golang
 BuildRequires:  meson
 BuildRequires:  ninja-build
+BuildRequires:  rust
+BuildRequires:  cargo
 
 Provides:       python3-fabric = 0.0.2
 Provides:       fabric-cli = 0.0.2
@@ -57,6 +60,7 @@ Requires:       wf-recorder
 Requires:       upower
 Requires:       NetworkManager
 Requires:       bluez
+Requires:       swayidle
 
 %description
 caffyne shell is a modern, GTK-based desktop shell built on top of Fabric, Python, and GTK.
@@ -66,6 +70,7 @@ It features a highly customizable drag-and-drop panel, fluid animations, and dee
 %setup -q -n caffyne-shell-main
 %setup -q -T -D -a 1 -n caffyne-shell-main
 %setup -q -T -D -a 2 -n caffyne-shell-main
+%setup -q -T -D -a 3 -n caffyne-shell-main
 
 %patch -P0 -p1 -d fabric-main
 
@@ -92,6 +97,11 @@ pushd fabric-main
 pip3 wheel --no-deps --wheel-dir dist . thefuzz==0.22.1
 popd
 
+# Build awww
+pushd awww
+cargo build --release
+popd
+
 %install
 # Create directories
 mkdir -p %{buildroot}/usr/share/caffyne-shell
@@ -116,10 +126,16 @@ pushd fabric-main
 pip3 install --no-index --no-deps --root %{buildroot} --prefix /usr dist/*.whl
 popd
 
+# Install awww
+install -m 755 awww/target/release/awww %{buildroot}%{_bindir}/awww
+install -m 755 awww/target/release/awww-daemon %{buildroot}%{_bindir}/awww-daemon
+
 %files
 /usr/share/caffyne-shell/
 %{_bindir}/startcaffyneshell
 %{_bindir}/fabric-cli
+%{_bindir}/awww
+%{_bindir}/awww-daemon
 /usr/share/bash-completion/completions/fabric-cli
 /usr/share/fish/completions/fabric-cli.fish
 /usr/share/zsh/site-functions/_fabric-cli
