@@ -8,6 +8,7 @@ URL:            https://github.com/caffyne-org/caffyne-shell
 Source0:        https://github.com/WynnCr/caffyne-shell/archive/refs/heads/main.tar.gz#/caffyne-shell-1.0.0.tar.gz
 Source1:        https://github.com/Fabric-Development/fabric/archive/refs/heads/main.tar.gz#/fabric-main.tar.gz
 Source2:        https://github.com/Fabric-Development/fabric-cli/archive/refs/heads/main.tar.gz#/fabric-cli-main.tar.gz
+Patch0:         fabric-pygobject.patch
 
 
 BuildRequires:  python3-devel
@@ -66,8 +67,8 @@ It features a highly customizable drag-and-drop panel, fluid animations, and dee
 %setup -q -T -D -a 1 -n caffyne-shell-main
 %setup -q -T -D -a 2 -n caffyne-shell-main
 
-# Fix PyGObject enum compatibility bug in fabric
-sed -i 's/issubclass(type, (bool, int, float, str))/issubclass(type, (bool, int, float, str)) and not issubclass(type, __import__("enum").Enum)/g' fabric-main/fabric/core/service.py
+%patch -P0 -p0 -d fabric-main
+
 
 %build
 # Compile native snippets

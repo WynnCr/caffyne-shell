@@ -1,0 +1,24 @@
+--- fabric/core/service.py
++++ fabric/core/service.py
+@@ -119,10 +119,13 @@
+             )
+         try:
+-            _type = type if issubclass(type, (bool, int, float, str)) else object
++            _type = type if issubclass(type, (bool, int, float, str)) and not issubclass(type, __import__("enum").Enum) else object
+         except TypeError:
+             _type = object
+ 
++        _default = default_value if _type is not object else None
++        self.fabric_default = default_value
++
+         super().__init__(
+             type=_type,
+-            default=default_value,
++            default=_default,
+             nick=nickname or "",
+             blurb=description,
+@@ -137,3 +140,3 @@
+ 
+     def _default_getter(self, instance) -> T:
+-        return getattr(instance, ("_property_helper_" + self.name), self.default)
++        return getattr(instance, ("_property_helper_" + self.name), getattr(self, "fabric_default", self.default))
