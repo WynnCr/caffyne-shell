@@ -66,6 +66,9 @@ It features a highly customizable drag-and-drop panel, fluid animations, and dee
 %setup -q -T -D -a 1 -n caffyne-shell-main
 %setup -q -T -D -a 2 -n caffyne-shell-main
 
+# Fix PyGObject enum compatibility bug in fabric
+sed -i 's/issubclass(type, (bool, int, float, str))/issubclass(type, (bool, int, float, str)) and not issubclass(type, __import__("enum").Enum)/g' fabric-main/fabric/core/service.py
+
 %build
 # Compile native snippets
 pushd snippets/blur/lib
