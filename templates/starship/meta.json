@@ -1,0 +1,7 @@
+{
+  "id": "starship",
+  "name": "Starship Prompt",
+  "description": "Colors for the Starship shell prompt",
+  "input_path": "template.toml",
+  "output_path": "~/.config/starship.toml"
+}

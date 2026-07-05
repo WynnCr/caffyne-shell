@@ -1,0 +1,17 @@
+{
+  "id": "gtk",
+  "name": "GTK",
+  "description": "Colors for GTK3 and GTK4 applications",
+  "templates": [
+    {
+      "id": "gtk3",
+      "input_path": "template.css",
+      "output_path": "~/.config/gtk-3.0/gtk.css"
+    },
+    {
+      "id": "gtk4",
+      "input_path": "template.css",
+      "output_path": "~/.config/gtk-4.0/gtk.css"
+    }
+  ]
+}

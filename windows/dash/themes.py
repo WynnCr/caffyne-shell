@@ -2,12 +2,14 @@ from __future__ import annotations
 import threading
 import os
 from fabric.widgets.box import Box
+from fabric.widgets.eventbox import EventBox
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
+from fabric.utils import monitor_file
 from gi.repository import Gtk, GLib
-
-from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale
+from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale, HackedRevealer
 from services.singletons import theme_service
+from services.templates import template_service, TEMPLATES_DIR
 from services.themes import WALLPAPER_THEME
 from user_options import user_options
 
@@ -42,6 +44,132 @@ def _color_dot(hex_color: str, size: int = ACCENT_DOT, active: bool = False) -> 
         f"min-width: {size}px; min-height: {size}px;"
     )
     return dot
+
+class TemplateRefreshRow(Box):
+    def __init__(self, on_refresh_complete: callable | None = None, **kwargs):
+        self._on_refresh_complete = on_refresh_complete
+
+        self._btn = Button(
+            style_classes=["option-selection-button"],
+            child=Icon(icon_name="arrows-clockwise-duotone", icon_size=16),  # swap with your icon
+            on_clicked=self._on_clicked,
+        )
+
+        super().__init__(
+            orientation="h",
+            spacing=6,
+            h_expand=True,
+            h_align="fill",
+            style_classes=["section-child", "template-row"],
+            children=[
+                Label(
+                    label="Refresh Templates",
+                    style_classes=["dim-label"],
+                    h_align="start",
+                    h_expand=True,
+                ),
+                self._btn,
+            ],
+            **kwargs,
+        )
+
+    def _on_clicked(self, *_) -> None:
+        self._btn.set_sensitive(False)
+        template_service.fetch_templates(callback=self._on_done)
+
+    def _on_done(self, success: bool) -> None:
+        self._btn.set_sensitive(True)
+        if self._on_refresh_complete:
+            self._on_refresh_complete(success)
+
+class TemplateRow(EventBox):
+    """
+    A single template row showing:
+      - template name on the left
+      - smooth switch on the right
+      - notes revealer that slides down on hover
+    """
+
+    def __init__(self, meta: dict, **kwargs):
+        self._meta        = meta
+        self._template_id = meta["id"]
+        self._enabled     = meta.get("enabled", False)
+
+        self._switch = SmoothSwitch(
+            style_classes=["dash-switch"],
+            v_expand=True,
+            v_align="center",
+            on_user_toggle=self._on_toggled,
+            width=48,
+        )
+        self._switch.set_active(self._enabled)
+
+        header = Box(
+            orientation="h",
+            spacing=6,
+            h_align="fill",
+            h_expand=True,
+            v_expand=True,
+            v_align="center",
+            children=[
+                Label(
+                    label=meta.get("name", self._template_id),
+                    style_classes=["dim-label"],
+                    h_align="start",
+                    h_expand=True,
+                ),
+                Box(h_align="end", children=self._switch),
+            ],
+        )
+
+        notes_text = meta.get("notes", "")
+        self._notes_label = Label(
+            label=notes_text,
+            style_classes=["dim-label", "template-notes"],
+            h_align="start",
+            wrap=True,
+        )
+
+        self._revealer = HackedRevealer(
+            transition_type="slide-down",
+            duration=0.3,
+            child=self._notes_label,
+            reveal_child=False,
+        )
+
+        inner = Box(
+            orientation="v",
+            spacing=0,
+            h_expand=True,
+            style_classes=["section-child", "template-row"],
+            children=[header, self._revealer] if notes_text else [header],
+        )
+
+        super().__init__(
+            orientation="v",
+            h_expand=True,
+            child=inner,
+            **kwargs,
+        )
+
+        if notes_text:
+            self.connect("enter-notify-event", self._on_enter)
+            self.connect("leave-notify-event", self._on_leave)
+    def _on_enter(self, *_) -> None:
+        self._revealer.set_reveal_child(True)
+
+    def _on_leave(self, *_) -> None:
+        self._revealer.set_reveal_child(False)
+
+    def _on_toggled(self, state: bool) -> None:
+        template_service.set_enabled(self._template_id, state)
+        template_service.run_toggle_script(self._template_id, state)
+        template_service.build_matugen_config()
+        theme_service.apply()
+
+    def refresh(self, meta: dict) -> None:
+        """Update enabled state from freshly loaded meta."""
+        self._switch.set_active(meta.get("enabled", False))
 
 class Section(Box):
     """
@@ -339,38 +467,53 @@ class ThemePreview(Box):
             ],
         )
 
-        super().__init__(
+        self._template_rows: dict[str, TemplateRow] = {}
+        self._templates_section_body = None  # populated in _build_templates_section
+
+        templates_section = self._build_templates_section()
+
+        # wrap everything in a scrollable box
+        content = Box(
             orientation="v",
             spacing=24,
             h_align="fill",
-
             h_expand=True,
-
             style_classes=["theme-preview-panel"],
             children=[
                 Section(
                     title="Color Scheme",
-                    children=[
-                        mode_section,
-                        accent_section,
-                    ]
+                    children=[mode_section, accent_section],
                 ),
                 Section(
                     title="General",
-                    children=[
-                        radius_section,
-                        opacity_section,
-                        blur_section,
-                    ]
+                    children=[radius_section, opacity_section, blur_section],
                 ),
                 Section(
                     title="Fonts",
-                    children=[
-                        font_section
-                    ]
-                )
+                    children=[font_section],
+                ),
+                templates_section,
             ],
         )
+
+        scroll = ClippingScrolledWindow(
+            h_expand=True,
+            # v_expand=True,
+            overlay_scroll=True,
+            kinetic_scroll=True,
+            max_content_size=(918, 423),
+            style="margin-bottom: 4px;",
+            child=content,
+        )
+
+        super().__init__(
+            orientation="v",
+            spacing=0,
+            h_align="fill",
+            h_expand=True,
+            children=[scroll],
+        )
+
 
         self._update_mode_buttons(user_options.theme.is_dark)
         self._on_radius_clicked(user_options.theme.border_style)
@@ -486,6 +629,53 @@ class ThemePreview(Box):
         with open(path, "w") as f:
             f.write(css + "\n")
 
+    def _build_templates_section(self) -> Section:
+        templates = template_service.list_templates()
+        rows = []
+        for meta in templates:
+            row = TemplateRow(meta)
+            self._template_rows[meta["id"]] = row
+            rows.append(row)
+
+        refresh_row = TemplateRefreshRow(on_refresh_complete=self._on_templates_refreshed)
+
+        section = Section(
+            title="App Templates",
+            children=[
+                *( rows if rows else [
+                    Label(
+                        label="No templates found — click refresh to get started",
+                        style_classes=["dim-label"],
+                        h_align="start",
+                    )
+                ]),
+                refresh_row,
+            ],
+        )
+        self._templates_section = section
+        return section
+
+
+    def _on_templates_refreshed(self, success: bool) -> None:
+        if success:
+            self.refresh_templates()
+
+    def refresh_templates(self) -> None:
+        """Reload template enabled states — call when panel becomes visible."""
+        templates = template_service.list_templates()
+        for meta in templates:
+            row = self._template_rows.get(meta["id"])
+            if row:
+                row.refresh(meta)
+
+    def _rebuild_templates_section(self) -> None:
+        content = self._scroll.get_child()  # the inner content Box
+        content.remove(self._templates_section)
+        self._template_rows.clear()
+        self._templates_section = self._build_templates_section()
+        content.add(self._templates_section)
+        content.show_all()
+
 class DashThemePage(Box):
 
     def __init__(self, bar_manager):
@@ -537,7 +727,11 @@ class DashThemePage(Box):
 
         self._load_thumbs()
         self._restore_active(theme_service.active_theme_name)
-
+        if template_service.monitor:
+            template_service.monitor.connect(
+                "changed", 
+                lambda *_: GLib.idle_add(self._preview._rebuild_templates_section)
+            )
         theme_service.connect("mode-changed", self._on_mode_changed)
         theme_service.connect("accent-changed", lambda _: self._preview.refresh_active_accent())
 
@@ -556,6 +750,7 @@ class DashThemePage(Box):
             if not self._thumb_strip.get_children():
                 self._load_thumbs()
                 self._restore_active(theme_service.active_theme_name)
+            self._preview.refresh_templates()
         else:
             self._unload_thumbs()
 
@@ -608,7 +803,7 @@ class DashThemePage(Box):
         user_options.save()
 
     def _set_active(self, thumb: ThemeThumb | MatugenThumb) -> None:
-        if self._active_thumb:
+        if self._active_thumb and self._active_thumb is not thumb:
             self._active_thumb.set_active(False)
         self._active_thumb = thumb
         thumb.set_active(True)
@@ -621,18 +816,11 @@ class DashThemePage(Box):
 
     def _restore_active(self, name: str) -> None:
         for thumb in self._thumb_strip.get_children():
-            if isinstance(thumb, (ThemeThumb, MatugenThumb)) and thumb.theme_name == name:
-                if self._active_thumb:
-                    self._active_thumb.set_active(False)
-                self._active_thumb = thumb
-                thumb.set_active(True)
-                if isinstance(thumb, MatugenThumb):
-                    self._preview.load_theme(None)
+            if isinstance(thumb, (ThemeThumb, MatugenThumb)):
+                if thumb.theme_name == name:
+                    self._set_active(thumb)  # reuse _set_active so deselect logic is always consistent
                 else:
-                    self._preview.load_theme(
-                        theme_service.load_theme_data(name, dark=theme_service.is_dark)
-                    )
-                return
+                    thumb.set_active(False)  # explicitly deselect everything else
 
     def _on_mode_changed(self, _service) -> None:
         self._load_thumbs()

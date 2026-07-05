@@ -1,0 +1,19 @@
+{
+  "id": "kvantum",
+  "name": "Kvantum",
+  "description": "Kvantum theme engine colors",
+  "notes": "Post hook strips decimal points from the kvconfig after generation",
+  "templates": [
+    {
+      "id": "kvantum_kvconfig",
+      "input_path": "template.kvconfig",
+      "output_path": "~/.config/Kvantum/matugen/matugen.kvconfig"
+    },
+    {
+      "id": "kvantum_svg",
+      "input_path": "template.svg",
+      "output_path": "~/.config/Kvantum/matugen/matugen.svg",
+      "post_hook": "sleep 1 && sed -i 's/\\(\\([0-9]\\+\\)\\)\\.[0-9]\\+/\\1/g' ~/.config/Kvantum/matugen/matugen.kvconfig"
+    }
+  ]
+}

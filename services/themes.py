@@ -8,6 +8,8 @@ from loguru import logger
 
 from user_options import user_options
 from .wallpaper import WallpaperService
+from .templates import template_service, MATUGEN_CONFIG_CACHE
+
 THEMES_DIR       = os.path.expanduser("~/.config/caffyne-shell/themes")
 LIGHT_THEMES_DIR = os.path.join(THEMES_DIR, "light")
 DARK_THEMES_DIR  = os.path.join(THEMES_DIR, "dark")
@@ -295,6 +297,7 @@ class ThemeService(Service):
 
         return {"colors": colors}
 
+
     def _apply(self) -> bool:
         mode        = "dark" if self._is_dark else "light"
         active_name = self._dark_theme if self._is_dark else self._light_theme
@@ -328,9 +331,15 @@ class ThemeService(Service):
                 os.makedirs(os.path.dirname(CACHE_THEME_PATH), exist_ok=True)
                 with open(CACHE_THEME_PATH, "w") as f:
                     json.dump(matugen_json, f, indent=2)
-                logger.info(f"[ThemeService] wrote theme JSON → {CACHE_THEME_PATH}")
 
                 cmd = ["matugen", "json", CACHE_THEME_PATH, "-m", mode, "--opacity", str(user_options.theme.opacity)]
+
+            # ensure config exists, generate if not
+            if not os.path.isfile(MATUGEN_CONFIG_CACHE):
+                logger.info("[ThemeService] no matugen config found, generating...")
+                template_service.build_matugen_config()
+
+            cmd += ["-c", MATUGEN_CONFIG_CACHE]
 
             logger.info(f"[ThemeService] running: {' '.join(cmd)}")
             subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -342,4 +351,3 @@ class ThemeService(Service):
             logger.error(f"[ThemeService] unexpected error: {e}")
 
         return GLib.SOURCE_REMOVE
-
