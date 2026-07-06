@@ -1314,6 +1314,7 @@ class Bar(Window):
         self.monitor_name: str | None = None
         self._wm_changed_timeout = None
         self._is_hovered = False
+        self._had_windows = True
         
         if bar_cfg is not None:
             self.bar_config = bar_cfg
@@ -1617,13 +1618,17 @@ class Bar(Window):
         if not has_windows:
             if self._wm_changed_timeout is None:
                 self._wm_changed_timeout = GLib.timeout_add(450, self._do_show_if_empty)
+            self._had_windows = False
         else:
             if self._wm_changed_timeout is not None:
                 GLib.source_remove(self._wm_changed_timeout)
                 self._wm_changed_timeout = None
-            if not (open_applet is not None and open_applet.is_visible()):
-                if not self._is_hovered:
-                    self._do_hide()
+                
+            if not self._had_windows:
+                if not (open_applet is not None and open_applet.is_visible()):
+                    if not self._is_hovered:
+                        self._do_hide()
+            self._had_windows = True
 
     def _on_bar_enter(self, _, event: Gdk.EventCrossing):
         if event.detail != Gdk.NotifyType.INFERIOR:
