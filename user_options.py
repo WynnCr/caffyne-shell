@@ -110,6 +110,10 @@ class UserOptions:
             self.border_style = "medium"
             self.font_monospace_style = "none"
 
+    class Templates:
+        def __init__(self):
+            self.enabled: list[str] = []
+
     class Launcher:
         def __init__(self):
             self.grid = False
@@ -131,6 +135,7 @@ class UserOptions:
         self.bars = self.Bars()
         self.timeouts = self.IdleTimeouts()
         self.theme = self.Theme()
+        self.templates = self.Templates()
         self.launcher = self.Launcher()
         self.dock = self.Dock()
         self.world_clocks = self.WorldClocks()
@@ -177,7 +182,8 @@ class UserOptions:
                     "launcher",
                     "dock",
                     "world_clocks",
-                    "wallpaper"
+                    "wallpaper",
+                    "templates"
                 )
             }
 

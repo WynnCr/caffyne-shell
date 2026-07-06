@@ -8,6 +8,7 @@ venv/
 result
 plugins/*
 wallpapers/*
+templates/*
 
 styles/colors.css
 styles/borders.css
