@@ -201,8 +201,9 @@
 
 
 .dash-theme-preview-title {
-    margin-top: 32px;
-    margin-left: 64px;
+    /* margin-top: 32px;
+    margin-left: 64px; */
+    margin: 32px 64px;
     font-size: 24px;
     font-weight: 600;
     font-family: apply(mixed-mono);

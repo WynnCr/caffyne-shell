@@ -7,7 +7,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.utils import monitor_file
 from gi.repository import Gtk, GLib
-from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale, HackedRevealer
+from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale, AnimatedScroll
 from services.singletons import theme_service
 from services.templates import template_service, TEMPLATES_DIR
 from services.themes import WALLPAPER_THEME
@@ -486,22 +486,22 @@ class ThemePreview(Box):
             ],
         )
 
-        self._scroll = ClippingScrolledWindow(
-            h_expand=True,
-            # v_expand=True,
-            overlay_scroll=True,
-            kinetic_scroll=True,
-            max_content_size=(918, 423),
-            style="margin-bottom: 4px;",
-            child=content,
-        )
+        # self._scroll = AnimatedScroll(
+        #     h_expand=True,
+        #     # v_expand=True,
+        #     overlay_scroll=True,
+        #     kinetic_scroll=True,
+        #     # max_content_size=(918, 423),
+        #     style="margin-bottom: 4px;",
+        #     child=,
+        # )
 
         super().__init__(
             orientation="v",
             spacing=0,
             h_align="fill",
             h_expand=True,
-            children=[self._scroll],
+            children=[content],
         )
 
 
@@ -687,9 +687,21 @@ class DashThemePage(Box):
     def __init__(self, bar_manager):
         self._active_thumb: ThemeThumb | MatugenThumb | None = None
         self._rebuild_timeout_id = None
-
-
         self._preview = ThemePreview(bar_manager)
+
+        self._preview_scroll = ClippingScrolledWindow(
+            h_expand=True,
+            # v_expand=True,
+            overlay_scroll=True,
+            kinetic_scroll=True,
+            max_content_size=(918, 542),
+            # style="margin: 2px 0px;",
+            # style="min-width: 200px; min-height: 200px;",
+            child=Box(
+                orientation="v",
+                children=[Label(label="Theming", h_expand=True, h_align="start", style_classes=["dash-theme-preview-title"]), self._preview],
+            ),
+        )
         self._preview_box = ClippingBox(
             style_classes=["dash-grid-selector-preview", "theme-preview-box"],
             spacing=16,
@@ -698,14 +710,15 @@ class DashThemePage(Box):
             v_align="start",
             h_expand=True,
             v_expand=True,
-            children=[Label(label="Theming", h_expand=True, h_align="start", style_classes=["dash-theme-preview-title"]), self._preview],
+            children=self._preview_scroll
         )
+
         self._thumb_strip = Box(
             orientation="v",
             spacing=12,
             style_classes=["wallpaper-thumb-strip"],
         )
-        self._scroll = ClippingScrolledWindow(
+        self._theme_scroll = ClippingScrolledWindow(
             v_expand=True,
             style_classes=["grid-selector-thumb-scroll"],
             max_content_size=(174, 630),
@@ -714,7 +727,7 @@ class DashThemePage(Box):
             overlay_scroll=True,
             kinetic_scroll=True,
         )
-        self._scroll.set_size_request(174, 630)
+        self._theme_scroll.set_size_request(174, 630)
 
         super().__init__(
             orientation="v",
@@ -728,7 +741,7 @@ class DashThemePage(Box):
                     spacing=12,
                     h_expand=True,
                     v_expand=True,
-                    children=[self._preview_box, self._scroll],
+                    children=[self._preview_box, self._theme_scroll],
                 ),
             ],
         )
