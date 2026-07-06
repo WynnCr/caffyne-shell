@@ -1312,7 +1312,6 @@ class Bar(Window):
         self._dash_changed_callbacks: list[callable] = []
         self._hide_timeout = None
         self.monitor_name: str | None = None
-        self._wm_changed_timeout = None
         self._is_hovered = False
         self._had_windows = True
         
@@ -1586,7 +1585,7 @@ class Bar(Window):
             self._on_wm_changed()
         return False
 
-    def _has_windows_on_active_workspace(self) -> bool:
+    def _has_windows_on_active_workspace(self) -> bool | None:
         if self.monitor_name is None:
             return True
         windows = wm.windows or []
@@ -1596,11 +1595,10 @@ class Bar(Window):
             if not ws.is_active:
                 continue
             return any(w.workspace_id == ws.id for w in windows)
-        return True
+        return None
 
     def _do_show_if_empty(self):
-        self._wm_changed_timeout = None
-        if not self._has_windows_on_active_workspace():
+        if self._has_windows_on_active_workspace() is False:
             if self._hide_timeout is not None:
                 GLib.source_remove(self._hide_timeout)
                 self._hide_timeout = None
@@ -1616,16 +1614,13 @@ class Bar(Window):
             return
             
         has_windows = self._has_windows_on_active_workspace()
+        if has_windows is None:
+            return # Ignore intermediate WM states to prevent stuttering
         
         if not has_windows:
-            if self._wm_changed_timeout is None:
-                self._wm_changed_timeout = GLib.timeout_add(450, self._do_show_if_empty)
+            self._do_show_if_empty()
             self._had_windows = False
         else:
-            if self._wm_changed_timeout is not None:
-                GLib.source_remove(self._wm_changed_timeout)
-                self._wm_changed_timeout = None
-                
             if not self._had_windows:
                 if not (open_applet is not None and open_applet.is_visible()):
                     if not self._is_hovered:
