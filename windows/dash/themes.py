@@ -7,7 +7,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.utils import monitor_file
 from gi.repository import Gtk, GLib
-from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale, AnimatedScroll
+from snippets import Icon, ClippingScrolledWindow, ClippingBox, SmoothSwitch, FlatScale
 from services.singletons import theme_service
 from services.templates import template_service, TEMPLATES_DIR
 from services.themes import WALLPAPER_THEME
