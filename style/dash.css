@@ -93,7 +93,8 @@
 
 .theme-preview-box {
     min-width: 918px;
-    min-height: 546px;
+    min-height: 543px;
+    padding-top: 3px;
     background-color: var(--surface_container_lowest);
     box-shadow: inset 0 0 0 1px var(--primary);
 }
