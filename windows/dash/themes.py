@@ -637,7 +637,7 @@ class ThemePreview(Box):
                     Label(
                         label="No templates found — click refresh to get started",
                         style_classes=["dim-label"],
-                        h_align="start",
+                        h_align="fill",
                     )
                 ]),
             ],
@@ -674,7 +674,7 @@ class ThemePreview(Box):
             self._templates_section.add_child(
                 Label(
                     label="No templates found — click refresh to get started",
-                    style_classes=["dim-label"],
+                    style_classes=["dim-label", "section-child", "template-row"],
                     h_align="fill",
                 )
             )
