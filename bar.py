@@ -1419,6 +1419,8 @@ class Bar(Window):
         return section
 
     def _update_blur_region(self) -> bool:
+        if self._blur_ctx is None:
+            return False
         set_blur_regions_from_widget(self._blur_ctx, self, accuracy=1, erode=0)
         return False
 
