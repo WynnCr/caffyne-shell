@@ -1311,6 +1311,9 @@ class Bar(Window):
         self._bar_manager = bar_manager
         self._dash_changed_callbacks: list[callable] = []
         self._hide_timeout = None
+        self.monitor_name: str | None = None
+        self._wm_changed_timeout = None
+        self._is_hovered = False
         
         if bar_cfg is not None:
             self.bar_config = bar_cfg
@@ -1371,6 +1374,10 @@ class Bar(Window):
         if user_options.theme.blur:
             self._blur_ctx = enable_blur(self)
             GLib.timeout_add(1500, self._update_blur_region)
+
+        GLib.timeout_add(500, self._resolve_monitor_name)
+        wm.connect("notify::windows", lambda *_: self._on_wm_changed())
+        wm.connect("notify::workspaces", lambda *_: self._on_wm_changed())
 
     def _build_section(self, section_name: str) -> DraggableSection:
         entries: list = self.bar_config.get(section_name, [])
@@ -1541,7 +1548,8 @@ class Bar(Window):
         self.auto_hide = not self.auto_hide
         self.bar_config["auto_hide"] = self.auto_hide
         if self.auto_hide:
-            self._update_blur_region()
+            if self._blur_ctx:
+                self._update_blur_region()
             self._centerbox.add_style_class("auto-hide")
             self.exclusivity = "none"
             self._revealer.set_reveal_child(False)
@@ -1550,7 +1558,8 @@ class Bar(Window):
             self._centerbox.remove_style_class("auto-hide")
             self.exclusivity = "auto"
             self._revealer.set_reveal_child(True)
-            GLib.timeout_add(320, self._update_blur_region)
+            if self._blur_ctx:
+                GLib.timeout_add(320, self._update_blur_region)
         user_options.save()
 
     def _swap_bars(self):
@@ -1567,7 +1576,58 @@ class Bar(Window):
         a._set_alignment(b_align)
         b._set_alignment(a_align)
         
+    def _resolve_monitor_name(self) -> bool:
+        name = get_connector_from_monitor_id(self.monitor_id)
+        if name:
+            self.monitor_name = name
+            self._on_wm_changed()
+        return False
+
+    def _has_windows_on_active_workspace(self) -> bool:
+        if self.monitor_name is None:
+            return True
+        windows = wm.windows or []
+        for ws in wm.workspaces or []:
+            if ws.output != self.monitor_name:
+                continue
+            if not ws.is_active:
+                continue
+            return any(w.workspace_id == ws.id for w in windows)
+        return True
+
+    def _do_show_if_empty(self):
+        self._wm_changed_timeout = None
+        if not self._has_windows_on_active_workspace():
+            if self._hide_timeout is not None:
+                GLib.source_remove(self._hide_timeout)
+                self._hide_timeout = None
+            if not self._revealer.get_reveal_child():
+                self._revealer.set_reveal_child(True)
+                self._centerbox.add_style_class("revealed")
+        return False
+
+    def _on_wm_changed(self):
+        if not self.auto_hide or self.monitor_name is None:
+            return
+        if edit_mode.edit_mode:
+            return
+            
+        has_windows = self._has_windows_on_active_workspace()
+        
+        if not has_windows:
+            if self._wm_changed_timeout is None:
+                self._wm_changed_timeout = GLib.timeout_add(450, self._do_show_if_empty)
+        else:
+            if self._wm_changed_timeout is not None:
+                GLib.source_remove(self._wm_changed_timeout)
+                self._wm_changed_timeout = None
+            if not (open_applet is not None and open_applet.is_visible()):
+                if not self._is_hovered:
+                    self._do_hide()
+
     def _on_bar_enter(self, _, event: Gdk.EventCrossing):
+        if event.detail != Gdk.NotifyType.INFERIOR:
+            self._is_hovered = True
         if not self.auto_hide:
             return
         if event.detail == Gdk.NotifyType.INFERIOR:
@@ -1581,9 +1641,13 @@ class Bar(Window):
         self._centerbox.add_style_class("revealed")
 
     def _on_bar_leave(self, _, event: Gdk.EventCrossing):
+        if event.detail != Gdk.NotifyType.INFERIOR:
+            self._is_hovered = False
         if not self.auto_hide:
             return
         if event.detail == Gdk.NotifyType.INFERIOR:
+            return
+        if not self._has_windows_on_active_workspace():
             return
         if self._hide_timeout is not None:
             GLib.source_remove(self._hide_timeout)
@@ -1600,8 +1664,9 @@ class Bar(Window):
 
     def _do_hide(self):
         self.exclusivity = "none"
-        self._revealer.set_reveal_child(False)
-        self._centerbox.remove_style_class("revealed")
+        if self._revealer.get_reveal_child():
+            self._revealer.set_reveal_child(False)
+            self._centerbox.remove_style_class("revealed")
 
     def _on_edit_mode_changed(self, *_):
         if open_applet:
