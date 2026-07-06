@@ -328,7 +328,6 @@ class ThemePreview(Box):
     def __init__(self, bar_manager):
         self._accent_buttons: dict[str, Gtk.DrawingArea] = {}
         self.bar_manager = bar_manager
-
         self._accent_row = Box(
             orientation="h",
             spacing=8,
@@ -487,7 +486,7 @@ class ThemePreview(Box):
             ],
         )
 
-        scroll = ClippingScrolledWindow(
+        self._scroll = ClippingScrolledWindow(
             h_expand=True,
             # v_expand=True,
             overlay_scroll=True,
@@ -502,7 +501,7 @@ class ThemePreview(Box):
             spacing=0,
             h_align="fill",
             h_expand=True,
-            children=[scroll],
+            children=[self._scroll],
         )
 
 
@@ -649,8 +648,7 @@ class ThemePreview(Box):
 
     def _on_templates_refreshed(self, success: bool) -> None:
         if success:
-            self.refresh_templates()
-
+            self._rebuild_templates_section()
     def refresh_templates(self) -> None:
         """Reload template enabled states — call when panel becomes visible."""
         templates = template_service.list_templates()
@@ -658,19 +656,38 @@ class ThemePreview(Box):
             row = self._template_rows.get(meta["id"])
             if row:
                 row.refresh(meta)
-
     def _rebuild_templates_section(self) -> None:
-        content = self._scroll.get_child()  # the inner content Box
-        content.remove(self._templates_section)
+        if not hasattr(self, "_templates_section"):
+            return
+
+        self._templates_section.clear()
         self._template_rows.clear()
-        self._templates_section = self._build_templates_section()
-        content.add(self._templates_section)
-        content.show_all()
+        refresh_row = TemplateRefreshRow(on_refresh_complete=self._on_templates_refreshed)
+        self._templates_section.add_child(refresh_row)
+        templates = template_service.list_templates()
+        if templates:
+            for meta in templates:
+                row = TemplateRow(meta)
+                self._template_rows[meta["id"]] = row
+                self._templates_section.add_child(row)
+        else:
+            self._templates_section.add_child(
+                Label(
+                    label="No templates found — click refresh to get started",
+                    style_classes=["dim-label"],
+                    h_align="fill",
+                )
+            )
+
+
+        self._templates_section.show_all()
 
 class DashThemePage(Box):
 
     def __init__(self, bar_manager):
         self._active_thumb: ThemeThumb | MatugenThumb | None = None
+        self._rebuild_timeout_id = None
+
 
         self._preview = ThemePreview(bar_manager)
         self._preview_box = ClippingBox(
@@ -720,8 +737,8 @@ class DashThemePage(Box):
         self._restore_active(theme_service.active_theme_name)
         if template_service.monitor:
             template_service.monitor.connect(
-                "changed", 
-                lambda *_: GLib.idle_add(self._preview._rebuild_templates_section)
+                "changed",
+                self._on_templates_dir_changed
             )
         theme_service.connect("mode-changed", self._on_mode_changed)
         theme_service.connect("accent-changed", lambda _: self._preview.refresh_active_accent())
@@ -817,3 +834,15 @@ class DashThemePage(Box):
         self._load_thumbs()
         self._restore_active(theme_service.active_theme_name)
         self._preview._update_mode_buttons(theme_service.is_dark)
+    def _on_templates_dir_changed(self, *_) -> None:
+        if self._rebuild_timeout_id is not None:
+            GLib.source_remove(self._rebuild_timeout_id)
+        self._rebuild_timeout_id = GLib.timeout_add(
+            500,  # wait 500ms after last change before rebuilding
+            self._do_rebuild_templates
+        )
+
+    def _do_rebuild_templates(self) -> bool:
+        self._rebuild_timeout_id = None
+        self._preview._rebuild_templates_section()
+        return GLib.SOURCE_REMOVE
