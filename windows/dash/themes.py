@@ -50,9 +50,10 @@ class TemplateRefreshRow(Box):
         self._on_refresh_complete = on_refresh_complete
 
         self._btn = Button(
-            style_classes=["option-selection-button"],
-            child=Icon(icon_name="arrows-clockwise-duotone", icon_size=16),  # swap with your icon
+            style_classes=["applet-misc-button", "template-refresh-button"],
+            child=Icon(icon_name="arrows-clockwise-duotone", icon_size=16),
             on_clicked=self._on_clicked,
+            tooltip_text="Pull the latest templates from Github"
         )
 
         super().__init__(
@@ -63,7 +64,7 @@ class TemplateRefreshRow(Box):
             style_classes=["section-child", "template-row"],
             children=[
                 Label(
-                    label="Refresh Templates",
+                    label="Refresh",
                     style_classes=["dim-label"],
                     h_align="start",
                     h_expand=True,
@@ -103,6 +104,7 @@ class TemplateRow(EventBox):
             width=48,
         )
         self._switch.set_active(self._enabled)
+        notes_text = meta.get("notes", "")
 
         header = Box(
             orientation="h",
@@ -118,31 +120,30 @@ class TemplateRow(EventBox):
                     h_align="start",
                     h_expand=True,
                 ),
-                Box(h_align="end", children=self._switch),
+                Box(
+                    spacing=6,
+                    h_align="end",
+                    children=[
+                        Button(
+                            v_align="center",
+                            v_expand=True,
+                            style_classes=["template-info-button"],
+                            child=Icon(icon_name="info-duotone", icon_size=20),
+                            tooltip_markup=notes_text
+                        ) if notes_text else Box(),
+                        Box(children=self._switch),
+                    ]
+                )
             ],
         )
 
-        notes_text = meta.get("notes", "")
-        self._notes_label = Label(
-            label=notes_text,
-            style_classes=["dim-label", "template-notes"],
-            h_align="start",
-            wrap=True,
-        )
-
-        self._revealer = HackedRevealer(
-            transition_type="slide-down",
-            duration=0.3,
-            child=self._notes_label,
-            reveal_child=False,
-        )
 
         inner = Box(
             orientation="v",
             spacing=0,
             h_expand=True,
             style_classes=["section-child", "template-row"],
-            children=[header, self._revealer] if notes_text else [header],
+            children=header
         )
 
         super().__init__(
@@ -151,15 +152,6 @@ class TemplateRow(EventBox):
             child=inner,
             **kwargs,
         )
-
-        if notes_text:
-            self.connect("enter-notify-event", self._on_enter)
-            self.connect("leave-notify-event", self._on_leave)
-    def _on_enter(self, *_) -> None:
-        self._revealer.set_reveal_child(True)
-
-    def _on_leave(self, *_) -> None:
-        self._revealer.set_reveal_child(False)
 
     def _on_toggled(self, state: bool) -> None:
         template_service.set_enabled(self._template_id, state)
@@ -468,11 +460,10 @@ class ThemePreview(Box):
         )
 
         self._template_rows: dict[str, TemplateRow] = {}
-        self._templates_section_body = None  # populated in _build_templates_section
+        self._templates_section_body = None
 
         templates_section = self._build_templates_section()
 
-        # wrap everything in a scrollable box
         content = Box(
             orientation="v",
             spacing=24,
@@ -640,8 +631,9 @@ class ThemePreview(Box):
         refresh_row = TemplateRefreshRow(on_refresh_complete=self._on_templates_refreshed)
 
         section = Section(
-            title="App Templates",
+            title="Templates",
             children=[
+                refresh_row,
                 *( rows if rows else [
                     Label(
                         label="No templates found — click refresh to get started",
@@ -649,7 +641,6 @@ class ThemePreview(Box):
                         h_align="start",
                     )
                 ]),
-                refresh_row,
             ],
         )
         self._templates_section = section
@@ -818,9 +809,9 @@ class DashThemePage(Box):
         for thumb in self._thumb_strip.get_children():
             if isinstance(thumb, (ThemeThumb, MatugenThumb)):
                 if thumb.theme_name == name:
-                    self._set_active(thumb)  # reuse _set_active so deselect logic is always consistent
+                    self._set_active(thumb)
                 else:
-                    thumb.set_active(False)  # explicitly deselect everything else
+                    thumb.set_active(False)
 
     def _on_mode_changed(self, _service) -> None:
         self._load_thumbs()

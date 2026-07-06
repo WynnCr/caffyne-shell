@@ -207,3 +207,36 @@
     font-weight: 600;
     font-family: apply(mixed-mono);
 }
+
+.template-refresh-button {
+    background-color: var(--surface_container_high);
+}
+.template-refresh-button:hover {
+    background-color: var(--surface_container_highest);
+}
+.template-info-button {
+    padding: 4px;
+    transition: background-color 0.3s ease;
+    border-radius: apply(radius-m);
+}
+.template-info-button:hover {
+    background-color: var(--surface_container_high);
+}
+
+tooltip label {
+    background-color: var(--surface_container_high);
+    /* color: var(); */
+    border: 1px solid var(--outline_variant);
+    border-radius: apply(radius-m);
+    padding: 8px;
+    animation: tooltip-fade-in 150ms ease-out forwards;
+}
+
+@keyframes tooltip-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

@@ -1,9 +1,9 @@
 {
   "id": "kitty",
   "name": "Kitty Terminal",
-  "description": "Colors for the Kitty terminal emulator",
+  "description": "",
   "input_path": "template.conf",
   "output_path": "~/.config/kitty/themes/Matugen.conf",
   "post_hook": "kitty +kitten themes --reload-in=all Matugen",
-  "notes": "Requires Kitty to be running"
+  "notes": "Colors for the Kitty terminal emulator\n\nTo apply:\n • Run <tt><i>kitten themes</i></tt>\n • Select <tt><i>Matugen</i></tt> under the User section"
 }

@@ -12,7 +12,7 @@ from loguru import logger
 from user_options import user_options
 
 TEMPLATES_DIR        = os.path.expanduser("~/.config/caffyne-shell/templates")
-TEMPLATES_REPO       = "https://github.com/you/caffyne-templates"
+TEMPLATES_REPO       = "https://github.com/caffyne-org/caffyne-templates"
 MATUGEN_CONFIG_CACHE = os.path.expanduser("~/.cache/caffyne-shell/matugen-templates.toml")
 
 
@@ -119,9 +119,11 @@ class TemplateService:
                     lines.append(f"input_path = '{input_path}'")
                     lines.append(f"output_path = '{output_path}'")
 
-                    if post_hook := sub.get("post_hook"):
+                    if post_hook_script := sub.get("post_hook_script"):
+                        script_path = os.path.join(folder, post_hook_script)
+                        lines.append(f'post_hook = "bash {script_path}"')
+                    elif post_hook := sub.get("post_hook"):
                         lines.append(f'post_hook = "{post_hook}"')
-
                     lines.append("")
             else:
                 # original single template logic unchanged
@@ -137,7 +139,10 @@ class TemplateService:
                 lines.append(f"input_path = '{input_path}'")
                 lines.append(f"output_path = '{output_path}'")
 
-                if post_hook := t.get("post_hook"):
+                if post_hook_script := t.get("post_hook_script"):
+                    script_path = os.path.join(t["_folder"], post_hook_script)
+                    lines.append(f'post_hook = "bash {script_path}"')
+                elif post_hook := t.get("post_hook"):
                     lines.append(f'post_hook = "{post_hook}"')
 
                 lines.append("")

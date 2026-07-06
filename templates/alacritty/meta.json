@@ -1,7 +1,7 @@
 {
   "id": "alacritty",
   "name": "Alacritty Terminal",
-  "description": "Colors for the Alacritty terminal emulator",
+  "notes": "Colors for the Alacritty terminal emulator\nShould apply automatically",
   "input_path": "template.toml",
   "output_path": "~/.config/alacritty/colors.toml"
 }
