@@ -1,7 +1,0 @@
-{
-  "id": "starship",
-  "name": "Starship Prompt",
-  "notes": "Colors for the Starship shell prompt\nShould apply automatically",
-  "input_path": "template.toml",
-  "output_path": "~/.config/starship.toml"
-}

@@ -1,7 +1,0 @@
-{
-  "id": "alacritty",
-  "name": "Alacritty Terminal",
-  "notes": "Colors for the Alacritty terminal emulator\nShould apply automatically",
-  "input_path": "template.toml",
-  "output_path": "~/.config/alacritty/colors.toml"
-}
