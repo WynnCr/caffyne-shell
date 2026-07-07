@@ -696,7 +696,7 @@ class DashThemePage(Box):
             # v_expand=True,
             overlay_scroll=True,
             kinetic_scroll=True,
-            max_content_size=(918, 540),
+            max_content_size=(918, 544),
             # style="margin-top: 2px;",
             # style="min-width: 200px; min-height: 200px;",
             child=Box(
