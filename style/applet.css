@@ -19,6 +19,9 @@
 .applet-misc-button.active {
     background-color: var(--primary);
 }
+.applet-misc-button.active:hover {
+    background-color: mix(var(--primary), var(--on_primary_container), 0.2);
+}
 
 .applet-misc-button.active * {
     color: var(--on_primary);
