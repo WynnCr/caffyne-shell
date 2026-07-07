@@ -239,7 +239,7 @@ class LauncherApplet(Applet):
 
         self.connect("realize", self._on_realize)
         self._entry.connect("key-press-event", self._on_entry_key_press)
-        self._load_async(self._sorted_by_usage(self._all_apps[:16]), self._grid_mode)
+        self._load_async(self._sorted_by_usage(self._all_apps), self._grid_mode)
 
 
     def _on_realize(self, *_):
@@ -304,8 +304,9 @@ class LauncherApplet(Applet):
                 child.destroy()
             for child in self._grid_box.get_children():
                 child.destroy()
-        else:
-            self._load_async(self._sorted_by_usage(self._all_apps[:16]), self._grid_mode)
+            self._load_async(self._sorted_by_usage(self._all_apps), self._grid_mode)
+        # else:
+        #     self._load_async(self._sorted_by_usage(self._all_apps), self._grid_mode)
 
     def _sorted_by_usage(self, apps: list) -> list:
         usage = load_usage()
