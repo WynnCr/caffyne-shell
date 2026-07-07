@@ -3,7 +3,7 @@ import json
 import os
 import threading
 import subprocess
-
+import re
 from fabric.utils import monitor_file
 
 from gi.repository import GLib
@@ -14,6 +14,9 @@ from user_options import user_options
 TEMPLATES_DIR        = os.path.expanduser("~/.config/caffyne-shell/templates")
 TEMPLATES_REPO       = "https://github.com/caffyne-org/caffyne-templates"
 MATUGEN_CONFIG_CACHE = os.path.expanduser("~/.cache/caffyne-shell/matugen-templates.toml")
+MATUGEN_CONFIG_DIR  = os.path.expanduser("~/.config/matugen")
+MATUGEN_CONFIG_PATH = os.path.join(MATUGEN_CONFIG_DIR, "config.toml")
+
 
 
 class TemplateService:
@@ -82,28 +85,40 @@ class TemplateService:
         user_options.save()
         logger.info(f"[TemplateService] '{template_id}' {'enabled' if enabled else 'disabled'}")
 
+
     def build_matugen_config(self) -> str:
         """
         Build a matugen TOML config from the caffyne-shell template (always)
-        plus any user-enabled templates. Always returns the config path.
+        plus any user-enabled templates, then merge in any [templates.*] blocks
+        from the existing ~/.config/matugen/config.toml that aren't already covered.
+        Always returns the config path.
         """
         templates = self.list_templates()
         enabled   = [t for t in templates if t.get("enabled")]
 
+        # Collect all IDs that caffyne will manage so we can exclude them from the merge
+        managed_ids: set[str] = {"caffyne"}
+        for t in enabled:
+            sub_templates = t.get("templates")
+            if sub_templates:
+                for sub in sub_templates:
+                    managed_ids.add(sub["id"])
+            else:
+                managed_ids.add(t["id"])
+
         lines = ["[config]", ""]
 
-        # caffyne-shell colors are always applied
+        # caffyne-shell colors — always applied
         lines.append("[templates.caffyne]")
         lines.append(f"input_path = '{os.path.expanduser('~/.config/caffyne-shell/style/caffyne-shell-colors.css')}'")
         lines.append(f"output_path = '{os.path.expanduser('~/.config/caffyne-shell/style/colors.css')}'")
         lines.append("")
 
         for t in enabled:
-            folder = t["_folder"]
+            folder      = t["_folder"]
             template_id = t["id"]
-
-            # multi-template support
             sub_templates = t.get("templates")
+
             if sub_templates:
                 for sub in sub_templates:
                     sub_id      = sub["id"]
@@ -120,13 +135,11 @@ class TemplateService:
                     lines.append(f"output_path = '{output_path}'")
 
                     if post_hook_script := sub.get("post_hook_script"):
-                        script_path = os.path.join(folder, post_hook_script)
-                        lines.append(f'post_hook = "bash {script_path}"')
+                        lines.append(f'post_hook = "bash {os.path.join(folder, post_hook_script)}"')
                     elif post_hook := sub.get("post_hook"):
                         lines.append(f'post_hook = "{post_hook}"')
                     lines.append("")
             else:
-                # original single template logic unchanged
                 raw_input   = t.get("input_path", "")
                 input_path  = os.path.join(folder, raw_input) if not os.path.isabs(raw_input) else raw_input
                 output_path = os.path.expanduser(t.get("output_path", ""))
@@ -140,11 +153,17 @@ class TemplateService:
                 lines.append(f"output_path = '{output_path}'")
 
                 if post_hook_script := t.get("post_hook_script"):
-                    script_path = os.path.join(t["_folder"], post_hook_script)
-                    lines.append(f'post_hook = "bash {script_path}"')
+                    lines.append(f'post_hook = "bash {os.path.join(t["_folder"], post_hook_script)}"')
                 elif post_hook := t.get("post_hook"):
                     lines.append(f'post_hook = "{post_hook}"')
+                lines.append("")
 
+        # Merge unmanaged blocks from the existing matugen config
+        existing = self._parse_existing_matugen_templates(exclude_ids=managed_ids)
+        if existing:
+            lines.append("# --- merged from ~/.config/matugen/config.toml ---")
+            for block in existing:
+                lines.append(block)
                 lines.append("")
 
         try:
@@ -156,7 +175,38 @@ class TemplateService:
             logger.error(f"[TemplateService] failed to write config: {e}")
 
         return MATUGEN_CONFIG_CACHE
+    def _parse_existing_matugen_templates(self, exclude_ids: set[str]) -> list[str]:
+        if not os.path.isfile(MATUGEN_CONFIG_PATH):
+            return []
 
+        try:
+            with open(MATUGEN_CONFIG_PATH) as f:
+                raw = f.read()
+        except Exception as e:
+            logger.warning(f"[TemplateService] could not read existing matugen config: {e}")
+            return []
+
+        blocks = re.split(r'(?=^\[templates\.)', raw, flags=re.MULTILINE)
+
+        kept = []
+        for block in blocks:
+            m = re.match(r'^\[templates\.([^\]]+)\]', block)
+            if m is None:
+                continue
+            template_id = m.group(1)
+            if template_id in exclude_ids:
+                logger.info(f"[TemplateService] skipping existing template '{template_id}' (managed by caffyne)")
+                continue
+
+            block = re.sub(
+                r"(input_path\s*=\s*)'([^']+)'",
+                lambda m: f"{m.group(1)}'{os.path.join(MATUGEN_CONFIG_DIR, m.group(2)) if not os.path.isabs(m.group(2)) and not m.group(2).startswith('~') else m.group(2)}'",
+                block,
+            )
+
+            kept.append(block.rstrip())
+
+        return kept
     def fetch_templates(self, callback: callable | None = None) -> None:
         """
         Clone the templates repo if it doesn't exist, otherwise pull.
