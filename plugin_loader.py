@@ -78,7 +78,7 @@ def _load_one(
         for other in mod.INCOMPATIBLE_WITH:
             incompatible_groups.add(frozenset({name, other}))
             print(f"[plugins] {name} — marked incompatible with '{other}'")
-            
+
     # Register in Dash applet grid
     if bean_data is not None:
         icon = getattr(mod, "ICON", "placeholder-duotone")  # fallback icon
