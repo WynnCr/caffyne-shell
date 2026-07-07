@@ -64,11 +64,12 @@ class IconResolver:
             logger.warning(f"[ICONS] Failed to write cache: {exc}")
 
     def _store(self, app_id: str, icon: str) -> None:
+        if icon == FALLBACK_ICON:
+            return  # Don't persist misses — GIO index may not be ready yet
         with self._lock:
             self._mem_cache[app_id] = icon
             self._disk_dirty = True
             self._flush_disk_cache()
-
     def _build_gio_cache(self) -> None:
         additions: dict[str, str] = {}
 
