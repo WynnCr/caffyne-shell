@@ -55,7 +55,6 @@ class NoMediaPlaceholder(Box):
                                     Label(
                                         label="No Media Playing",
                                         h_align="start",
-                                        style="font-size: 14px; font-weight: bold;",
                                         ellipsization="end",
                                         max_chars_width=52,
                                     ),
@@ -131,7 +130,7 @@ class MediaPlayer(Box):
         self.artist_label = Label(
             label="",
             h_align="start",
-            style="font-size: 14px; font-weight: bold;",
+            style="font-weight: bold;",
             ellipsization="end",
             max_chars_width=52,
         )
@@ -139,7 +138,6 @@ class MediaPlayer(Box):
         self.title_label = Label(
             label="",
             h_align="start",
-            style="font-size: 14px;",
             ellipsization="end",
             max_chars_width=52,
         )
@@ -238,7 +236,7 @@ class MediaPlayer(Box):
         if total_duration:
             self.position_scale._max_value = total_duration
         self.position_scale.set_value(position)
-        
+
     def _on_meta_change(self, service, metadata, player):
         keys = metadata.keys()
         self.artist_label.set_label(

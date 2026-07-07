@@ -241,8 +241,10 @@ class ThemeThumb(Button):
             style=f"color: {text_color}; font-size: 14px;",
         )
 
-        dot_box = Box(style_classes=["theme-preview-color-container"], style=f"background-color: {surface_color}", orientation="h", spacing=4, h_align="center")
-        accent_list = list(accents.items())[:MAX_DOTS]
+        dot_box = Box(style_classes=["theme-preview-color-container"], style=f"background-color: {surface_color}", orientation="h", spacing=6, h_align="center")
+        all_accents = list(accents.items())
+        target_indices = [0, 1, 3, 7]
+        accent_list = [all_accents[i] for i in target_indices if i < len(all_accents)]
         for _accent_name, accent_hex in accent_list:
             dot = _color_dot(accent_hex, ACCENT_DOT)
             dot_box.add(dot)
@@ -531,7 +533,7 @@ class ThemePreview(Box):
 
         for accent_name, hex_color in accents.items():
             is_active = accent_name == active_accent
-            dot = _color_dot(hex_color, size=22, active=is_active)
+            dot = _color_dot(hex_color, size=24, active=is_active)
             btn = Button(
                 child=dot,
                 style_classes=["accent-btn"],
@@ -554,7 +556,7 @@ class ThemePreview(Box):
             old = btn.get_child()
             if old:
                 btn.remove(old)
-            btn.add(_color_dot(hex_color, size=22, active=is_active))
+            btn.add(_color_dot(hex_color, size=24, active=is_active))
             btn.show_all()
 
     def _on_opacity_released(self, scale, event) -> None:

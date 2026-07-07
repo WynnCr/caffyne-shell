@@ -255,20 +255,20 @@ class ProcessesMenu(AppletPage):
             stack=stack,
             child=Box(
                 orientation="v",
-                spacing=6,
+                spacing=8,
                 children=[
                     self._entry_box,
                     Box(
                         orientation="v",
-                        spacing=8,
+                        spacing=6,
                         children=[
                         Box(
                             style_classes=["process-header"],
                             spacing=12,
                             children=[
-                                Label(label="Name", h_align="start", style="min-width: 60px; font-size: 11px; margin-left: -6px", h_expand=True),
-                                Label(label="CPU", h_align="end", style="min-width: 60px; font-size: 11px;"),
-                                Label(label="RAM", h_align="end", style="min-width: 80px; font-size: 11px;"),
+                                Label(label="Name", h_align="start", style="min-width: 60px; font-size: 11px; opacity: 0.8; margin-left: -6px", h_expand=True),
+                                Label(label="CPU", h_align="end", style="min-width: 60px; font-size: 11px; opacity: 0.8;"),
+                                Label(label="RAM", h_align="end", style="min-width: 80px; font-size: 11px; opacity: 0.8;"),
                                 Box(style="min-width: 40px;"),
                             ],
                         ),
