@@ -22,6 +22,7 @@ from user_options import user_options
 
 bar_manager = None
 style_service = None
+toggleable_windows: dict[str, object] = {}
 audio = Audio()
 notifications = Notifications()
 bluetooth = BluetoothClient()

@@ -4,13 +4,8 @@
     background-color: var(--surface_container);
 }
 
-.timeout-label {
-    opacity: 0.6;
-    font-size: 14px;
-}
-
 .timeout-adjust-icon {
-    opacity: 0.6;
+    color: var(--on_surface_variant);
 }
 
 .timeout-adjust-button {

@@ -17,7 +17,7 @@ from bar_widgets import (
     CalculatorButton, SessionButton, KeyboardButton, SystemTray, Dock, BrightnessButton, DashButton
 )
 from user_options import user_options
-from services.singletons import edit_mode, wm
+from services.singletons import edit_mode, wm, toggleable_windows
 from windows import (
     CalculatorApplet, CalendarApplet, ClockApplet, NotificationHistoryApplet,
     WeatherApplet, MediaApplet, QuickSettings, LauncherApplet, ProcessMonitorApplet, WifiApplet, 
@@ -1727,7 +1727,7 @@ class BarManager:
         self._osds: dict[Gdk.Monitor, OSD] = {}
         self._fallback_popups: dict[str, AppletWindow] = {}
         self._display = Gdk.Display.get_default()
-
+        self._standalone_windows: dict[str, object] = {}
         for i in range(self._display.get_n_monitors()):
             monitor = self._display.get_monitor(i)
             self._add_bar(monitor, i)
@@ -1817,7 +1817,9 @@ class BarManager:
             if get_connector_from_monitor_id(i) == active_output:
                 active_monitor = monitor
                 break
-
+        if key in toggleable_windows:
+            toggleable_windows[key].toggle(active_monitor)
+            return
         if key == "Dash":
             if self._dash:
                 self._dash.toggle(active_monitor)
